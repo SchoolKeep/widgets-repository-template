@@ -1,12 +1,14 @@
 # Widgets Repository Template
 
-A repository for managing external widgets with automated registry generation and multi-branch support.
+A repository for managing external widgets with automated registry generation.
 
 ## Features
 
 **Automated Registry Generation** - Build `widget_registry.json` from individual widget configs
 
-**Multi-Branch Support** - Maintain different widget registries on different Git branches
+**Public/Private Visibility** - Generate GitHub raw URLs (public) or relative paths (private)
+
+**Multi-Branch Support** - Maintain different widget registries on different Git branches (public visibility only)
 
 **Validation** - Built-in validation ensures configs are correct
 
@@ -26,7 +28,7 @@ Replace the repository reference in `./config/defaults.json` (`SchoolKeep/widget
 ### Building the Registry
 
 ```bash
-# Generate widget_registry.json (uses current Git branch)
+# Generate widget_registry.json (uses current Git branch for public visibility)
 ./config/build-registry.sh
 
 # Preview without writing
@@ -36,9 +38,9 @@ Replace the repository reference in `./config/defaults.json` (`SchoolKeep/widget
 ./config/build-registry.sh --validate
 ```
 
-### Multi-Branch Registries
+### Multi-Branch Registries (Public Visibility Only)
 
-Create separate widget registries for different environments:
+When using `"public"` visibility, you can create separate widget registries for different environments:
 
 ```bash
 # Create a staging branch with different widgets
@@ -55,6 +57,8 @@ git push origin staging
 
 Each branch maintains its own `widget_registry.json` with URLs pointing to that branch's widgets. Perfect for staging, feature development, or environment-specific widgets.
 
+**Note:** Multi-branch support is not available for `"private"` visibility since relative paths don't include branch information.
+
 ## Documentation
 
 See [config/WIDGET_SETUP.md](config/WIDGET_SETUP.md) for complete documentation on:
@@ -66,7 +70,7 @@ See [config/WIDGET_SETUP.md](config/WIDGET_SETUP.md) for complete documentation 
 
 ## Files
 
-- `config/defaults.json` - Global configuration and default widget settings
+- `config/defaults.json` - Global configuration and default widget settings (includes `visibility` option for public/private endpoint generation)
 - `config/build-registry.sh` - Registry build script
 - `config/WIDGET_SETUP.md` - Complete setup and usage documentation
 - `widget_registry.json` - Generated registry (auto-updated, do not edit manually)

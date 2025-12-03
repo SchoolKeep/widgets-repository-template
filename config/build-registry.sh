@@ -107,24 +107,31 @@ CONTENT_FILE=$(jq -r '.contentFile' "$DEFAULTS_FILE")
 CONTENT_METHOD=$(jq -r '.contentMethod' "$DEFAULTS_FILE")
 REQUIRES_AUTH=$(jq -r '.requiresAuthentication' "$DEFAULTS_FILE")
 CACHE_STRATEGY=$(jq -r '.cacheStrategy' "$DEFAULTS_FILE")
+VISIBILITY=$(jq -r '.visibility // "public"' "$DEFAULTS_FILE")
 
-# Auto-detect current Git branch
-if ! git rev-parse --git-dir > /dev/null 2>&1; then
-  error "Not a git repository. Cannot detect branch."
-  exit 1
-fi
+# Auto-detect current Git branch (only needed for public visibility)
+BRANCH=""
+if [ "$VISIBILITY" = "public" ]; then
+  if ! git rev-parse --git-dir > /dev/null 2>&1; then
+    error "Not a git repository. Cannot detect branch."
+    exit 1
+  fi
 
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-if [ "$BRANCH" = "HEAD" ]; then
-  # Detached HEAD state - try to get the commit SHA
-  warning "In detached HEAD state"
-  BRANCH=$(git rev-parse --short HEAD)
-  warning "Using commit SHA: $BRANCH"
+  if [ "$BRANCH" = "HEAD" ]; then
+    # Detached HEAD state - try to get the commit SHA
+    warning "In detached HEAD state"
+    BRANCH=$(git rev-parse --short HEAD)
+    warning "Using commit SHA: $BRANCH"
+  fi
 fi
 
 success "Loaded configuration from $DEFAULTS_FILE"
-success "Detected Git branch: $BRANCH"
+success "Visibility mode: $VISIBILITY"
+if [ "$VISIBILITY" = "public" ]; then
+  success "Detected Git branch: $BRANCH"
+fi
 
 # Initialize widgets array
 WIDGETS_JSON="[]"
@@ -199,7 +206,11 @@ for widget_dir in "$WIDGETS_DIR"/*; do
   fi
 
   # Generate content endpoint URL with the correct content file
-  endpoint="https://raw.githubusercontent.com/${REPO}/refs/heads/${BRANCH}/${WIDGETS_DIR}/${widget_name}/${content_file_name}"
+  if [ "$VISIBILITY" = "private" ]; then
+    endpoint="./${WIDGETS_DIR}/${widget_name}/${content_file_name}"
+  else
+    endpoint="https://raw.githubusercontent.com/${REPO}/refs/heads/${BRANCH}/${WIDGETS_DIR}/${widget_name}/${content_file_name}"
+  fi
   
   # Build the widget object by merging defaults + widget.json + auto-generated fields
   # Filter out global config fields from defaults (keep only widget-specific defaults)
@@ -213,7 +224,7 @@ for widget_dir in "$WIDGETS_DIR"/*; do
     --arg cacheStrategy "$CACHE_STRATEGY" \
     '
     # Merge all sources
-    ($defaults[0] | del(.repository, .contentFile, .contentMethod, .requiresAuthentication, .cacheStrategy)) * $widget[0] * {
+    ($defaults[0] | del(.repository, .visibility, .contentFile, .contentMethod, .requiresAuthentication, .cacheStrategy)) * $widget[0] * {
       "type": $type,
       "content": {
         "endpoint": $endpoint,

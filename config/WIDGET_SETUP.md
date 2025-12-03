@@ -33,6 +33,7 @@ This file contains both global configuration and default values for all widgets:
 ```json
 {
   "repository": "gs-mrozmus/widgets-repo-template",
+  "visibility": "public",
   "contentFile": "content.html",
   "contentMethod": "GET",
   "requiresAuthentication": false,
@@ -50,7 +51,10 @@ This file contains both global configuration and default values for all widgets:
 ```
 
 **Global Configuration Fields:**
-- `repository` - GitHub repository in format `owner/repo` (required, set by user)
+- `repository` - GitHub repository in format `owner/repo` (required for public visibility)
+- `visibility` - Endpoint generation mode: `"public"` or `"private"` (default: "public")
+  - `"public"`: Generates GitHub raw URLs using `repository` and current Git branch
+  - `"private"`: Generates relative paths (e.g., `./widgets/demo_widget/content.html`), ignores `repository` config
 - `contentFile` - Name of the HTML content file (default: "content.html")
 - `contentMethod` - HTTP method for fetching content (default: "GET")
 - `requiresAuthentication` - Whether content requires auth (default: false)
@@ -61,7 +65,7 @@ This file contains both global configuration and default values for all widgets:
 - `widgetsLibrary` - Whether widget appears in library
 - `settings` - Default widget behavior settings
 
-**Note:** The Git branch is automatically detected from your current checkout. This allows you to maintain separate widget registries on different branches.
+**Note:** When using `"public"` visibility, the Git branch is automatically detected from your current checkout. This allows you to maintain separate widget registries on different branches. For `"private"` visibility, Git branch detection is skipped.
 
 ### widget.json
 
@@ -179,7 +183,7 @@ Display usage information.
 ## How It Works
 
 1. **Reads** global configuration from `config/defaults.json`
-2. **Detects** the current Git branch automatically
+2. **Detects** the current Git branch automatically (public visibility only)
 3. **Scans** the `widgets/` directory for subdirectories
 4. **Reads** each widget's `widget.json` configuration
 5. **Merges** widget-specific defaults and config:
@@ -192,17 +196,23 @@ Display usage information.
 ### Auto-Generated Fields
 
 - `type`: Derived from the directory name (e.g., `my_widget`)
-- `content.endpoint`: Generated URL based on `config/defaults.json` settings and current Git branch
-  - Format: `https://raw.githubusercontent.com/{repo}/refs/heads/{branch}/widgets/{type}/content.html`
-  - The `{branch}` is automatically detected from your current Git checkout
-  - The `{repo}` comes from the `repository` field in `config/defaults.json`
+- `content.endpoint`: Generated based on `visibility` setting in `config/defaults.json`
+  - **Public visibility** (default):
+    - Format: `https://raw.githubusercontent.com/{repo}/refs/heads/{branch}/widgets/{type}/content.html`
+    - The `{branch}` is automatically detected from your current Git checkout
+    - The `{repo}` comes from the `repository` field in `config/defaults.json`
+  - **Private visibility**:
+    - Format: `./widgets/{type}/content.html`
+    - Uses relative paths, does not require Git repository or `repository` config
 
-## Multi-Branch Workflow
+## Multi-Branch Workflow (Public Visibility Only)
 
-This system supports maintaining different widget registries on different Git branches. This is useful for:
+When using `"public"` visibility, this system supports maintaining different widget registries on different Git branches. This is useful for:
 - **Staging vs Production**: Test widgets on a `staging` branch before merging to `main`
 - **Feature Development**: Create feature branches with experimental widgets
 - **Environment-Specific Widgets**: Different widgets for different environments
+
+**Note:** Multi-branch support is not available for `"private"` visibility since relative paths (e.g., `./widgets/demo_widget/content.html`) don't include branch information.
 
 ### Example: Creating a Staging Registry
 
@@ -269,13 +279,16 @@ Ensure your `widget.json` includes all required fields:
 - `title`
 - `description`
 
-### Generated URLs are incorrect
+### Generated URLs are incorrect (Public Visibility)
 
 Check the following:
+- Verify `visibility` is set to `"public"` in `config/defaults.json`
 - Verify `repository` in `config/defaults.json` is correct (format: `owner/repo`)
 - Ensure `contentFile` in `config/defaults.json` matches your HTML file name
 - Verify you're on the correct Git branch (run `git branch --show-current`)
 - The script auto-detects the current branch and uses it in URLs
+
+**Note:** For `"private"` visibility, endpoints are relative paths and don't depend on repository or branch settings.
 
 ### Widget not showing up in registry
 
