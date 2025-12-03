@@ -6,8 +6,12 @@ This guide explains how to create and manage widgets in the widgets repository.
 
 This repository provides a system for managing widget configurations. Each widget is defined by:
 - A `widget.json` configuration file with metadata (title, description, version, etc.)
-- A `content.html` file containing the widget's HTML content
+- A `content.html` file containing the widget's complete content (HTML, CSS, and JavaScript)
 - Optional additional files (for React widgets, build configurations, etc.)
+
+**Important**: The `content.html` file must be completely self-contained. All HTML, CSS, and JavaScript must be included directly in this file. **Relative file references** (such as `<link rel="stylesheet" href="styles.css">` or `<script src="script.js">`) will not work, as the widget system only serves the `content.html` file itself. However, **publicly available endpoints** (absolute URLs like `https://cdn.example.com/style.css` or `https://fonts.googleapis.com/css2?family=...`) are accessible and can be used.
+
+**Embedding Requirement**: Widgets are embedded into existing HTML pages, so the `content.html` file must be an HTML fragment. Do not include `<html>`, `<head>`, or `<body>` tags, as these will conflict with the host page structure.
 
 The build script automatically scans all widgets, validates their configurations, and generates a unified `widget_registry.json` file that can be consumed by applications that need to display or manage these widgets.
 
@@ -48,6 +52,57 @@ Before creating widgets, ensure you have:
   - Linux: `sudo apt-get install jq` or `sudo yum install jq`
 - Basic knowledge of HTML/CSS/JavaScript (depending on your widget type)
 - Git (for version control, if using)
+
+## Content File Requirements
+
+### content.html
+
+The `content.html` file is the single source of truth for your widget's content. **All HTML, CSS, and JavaScript must be included directly in this file.**
+
+**Critical Requirements:**
+- **HTML Fragment**: Widgets are embedded into existing pages, so do not include `<html>`, `<head>`, or `<body>` tags
+- **Self-contained**: All styles must be in `<style>` tags within the HTML fragment, or use publicly available CDN resources
+- **Inline JavaScript**: All scripts must be in `<script>` tags within the HTML fragment, or use publicly available CDN resources
+- **No relative file references**: Relative file references (e.g., `href="styles.css"`, `src="./script.js"`, `src="../lib.js"`) will not work, as the widget system only serves the `content.html` file itself
+- **Public endpoints are accessible**: Absolute URLs to publicly available resources (e.g., `https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css`, `https://fonts.googleapis.com/css2?family=...`) will work and can be used
+
+**Example of correct structure (with inline styles/scripts):**
+```html
+<style>
+  .my-widget {
+    color: blue;
+    padding: 20px;
+  }
+</style>
+<div class="my-widget">
+  <h1>My Widget</h1>
+</div>
+<script>
+  console.log('Widget loaded');
+</script>
+```
+
+**Example using publicly available resources:**
+```html
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+<style>
+  .my-widget {
+    font-family: 'Roboto', sans-serif;
+    color: blue;
+    padding: 20px;
+  }
+</style>
+<div class="my-widget">
+  <h1>My Widget</h1>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+<script>
+  console.log('Widget loaded with lodash:', _.VERSION);
+</script>
+```
+
+**For React/Modern Frameworks:**
+If you're using a build tool (like Vite, Webpack, etc.), ensure your build process bundles all dependencies and outputs a single, self-contained HTML fragment. The build output should include all CSS and JavaScript inline or embedded, not as separate files. The output must be an HTML fragment (no `<html>`, `<head>`, or `<body>` tags) that can be embedded into existing pages.
 
 ## Configuration File
 
@@ -131,15 +186,29 @@ Widget-specific configuration (only unique fields needed):
    EOF
    ```
 
-3. **Create `content.html`** with your widget HTML:
+3. **Create `content.html`** with your widget HTML fragment (including all CSS and JavaScript):
    ```bash
    cat > widgets/my_new_widget/content.html << 'EOF'
+   <style>
+     .my-widget {
+       padding: 20px;
+       background-color: #f0f0f0;
+     }
+   </style>
    <div class="my-widget">
      <h1>My New Widget</h1>
      <p>Widget content goes here</p>
    </div>
+   <script>
+     console.log('Widget initialized');
+   </script>
    EOF
    ```
+   
+   **Remember**: 
+   - Relative file references (e.g., `href="styles.css"`, `src="./script.js"`) will not work
+   - Publicly available endpoints (absolute URLs like `https://cdn.example.com/style.css`) are accessible and can be used
+   - Do not include `<html>`, `<head>`, or `<body>` tags, as widgets are embedded into existing pages
 
 4. **Build the registry**:
    ```bash
@@ -260,6 +329,9 @@ Ensure your `widget.json` includes all required fields:
 4. **Don't edit `widget_registry.json` manually** - it will be overwritten
 5. **Keep widget names simple** - they become the `type` field (use lowercase, underscores)
 6. **Test locally** with `--dry-run` before pushing
+7. **Keep content.html self-contained** - Include all CSS and JavaScript inline, or use publicly available CDN resources; avoid relative file references
+8. **Use HTML fragments only** - Do not include `<html>`, `<head>`, or `<body>` tags, as widgets are embedded into existing pages
+9. **Use absolute URLs for external resources** - Relative file references won't work, but publicly available endpoints (CDNs, fonts, etc.) are accessible
 
 ## Examples
 
