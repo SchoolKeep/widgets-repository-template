@@ -1,5 +1,4 @@
 {
-  "repository": "SchoolKeep/widgets-repository-template",
   "visibility": "private",
   "contentFile": "content.html",
   "contentMethod": "GET",
