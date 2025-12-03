@@ -32,13 +32,13 @@ A template repository for managing and organizing widget configurations with aut
 
 ## Documentation
 
-For complete documentation on creating widgets, configuration, and usage, see [config/WIDGET_SETUP.md](config/WIDGET_SETUP.md).
+For complete documentation on creating widgets, configuration, and usage, see [widgets/WIDGET_SETUP.md](widgets/WIDGET_SETUP.md).
 
 ## Files
 
 - `bin/build-registry.sh` - Registry build script
 - `config/defaults.json` - Global configuration and default widget settings
-- `config/WIDGET_SETUP.md` - Complete setup and usage documentation
+- `widgets/WIDGET_SETUP.md` - Complete setup and usage documentation
 - `widget_registry.json` - Generated registry (auto-updated, do not edit manually)
 - `widgets/` - Individual widget directories
 
