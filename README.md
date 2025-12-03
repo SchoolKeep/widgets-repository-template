@@ -16,7 +16,11 @@ A repository for managing external widgets with automated registry generation.
 
 ### Configuring Script
 
-Replace the repository reference in `./config/defaults.json` (`SchoolKeep/widgets-repository-template`) with your repository's owner/name
+By default, `visibility` is set to `"private"` which generates relative paths for endpoints. No additional configuration is needed.
+
+For `"public"` visibility (GitHub raw URLs), update `./config/defaults.json`:
+- Set `"visibility": "public"`
+- Replace `"repository"` with your repository's owner/name (e.g., `"your-org/your-repo"`)
 
 ### Adding a New Widget
 

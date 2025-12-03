@@ -2,13 +2,13 @@
   "widgets": [
     {
       "title": "Demo widget",
-      "description": "Demo widget for displaying interesting content",
+      "description": "Demo widget for presentation purposes",
       "version": "1.0.0",
       "category": "Demo",
       "type": "demo_widget",
       "imageName": "demo_widget",
       "content": {
-        "endpoint": "https://raw.githubusercontent.com/SchoolKeep/widgets-repository-template/refs/heads/main/widgets/demo_widget/content.html",
+        "endpoint": "./widgets/demo_widget/content.html",
         "method": "GET",
         "requiresAuthentication": false,
         "cacheStrategy": "no-cache"

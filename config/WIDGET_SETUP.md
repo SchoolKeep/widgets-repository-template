@@ -33,7 +33,7 @@ This file contains both global configuration and default values for all widgets:
 ```json
 {
   "repository": "gs-mrozmus/widgets-repo-template",
-  "visibility": "public",
+  "visibility": "private",
   "contentFile": "content.html",
   "contentMethod": "GET",
   "requiresAuthentication": false,
@@ -52,7 +52,7 @@ This file contains both global configuration and default values for all widgets:
 
 **Global Configuration Fields:**
 - `repository` - GitHub repository in format `owner/repo` (required for public visibility)
-- `visibility` - Endpoint generation mode: `"public"` or `"private"` (default: "public")
+- `visibility` - Endpoint generation mode: `"public"` or `"private"` (default: "private")
   - `"public"`: Generates GitHub raw URLs using `repository` and current Git branch
   - `"private"`: Generates relative paths (e.g., `./widgets/demo_widget/content.html`), ignores `repository` config
 - `contentFile` - Name of the HTML content file (default: "content.html")
@@ -197,11 +197,11 @@ Display usage information.
 
 - `type`: Derived from the directory name (e.g., `my_widget`)
 - `content.endpoint`: Generated based on `visibility` setting in `config/defaults.json`
-  - **Public visibility** (default):
+  - **Public visibility**:
     - Format: `https://raw.githubusercontent.com/{repo}/refs/heads/{branch}/widgets/{type}/content.html`
     - The `{branch}` is automatically detected from your current Git checkout
     - The `{repo}` comes from the `repository` field in `config/defaults.json`
-  - **Private visibility**:
+  - **Private visibility** (default):
     - Format: `./widgets/{type}/content.html`
     - Uses relative paths, does not require Git repository or `repository` config
 

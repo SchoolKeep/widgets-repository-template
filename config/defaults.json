@@ -1,6 +1,6 @@
 {
   "repository": "SchoolKeep/widgets-repository-template",
-  "visibility": "public",
+  "visibility": "private",
   "contentFile": "content.html",
   "contentMethod": "GET",
   "requiresAuthentication": false,
