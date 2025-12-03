@@ -27,10 +27,10 @@ widgets-repo-template/
 ├── bin/
 │   └── build-registry.sh    # Script to build widget_registry.json
 ├── config/
-│   ├── defaults.json        # Configuration and default values
-│   └── WIDGET_SETUP.md      # This documentation file
+│   └── defaults.json        # Configuration and default values
 ├── widget_registry.json     # Generated registry (DO NOT EDIT MANUALLY)
 └── widgets/
+    ├── WIDGET_SETUP.md      # This documentation file
     ├── my_widget/
     │   ├── widget.json      # Widget-specific configuration
     │   └── content.html     # Widget HTML content
@@ -273,3 +273,4 @@ See the existing widgets in the `widgets/` directory for examples:
   - Shows how to integrate a modern JavaScript framework
   - Includes build configuration (`vite.config.ts`, `package.json`)
   - Demonstrates how to bundle React components into a widget
+
