@@ -2,9 +2,23 @@
 
 This guide explains how to create and manage widgets in the widgets repository.
 
+## What is This?
+
+This repository provides a system for managing widget configurations. Each widget is defined by:
+- A `widget.json` configuration file with metadata (title, description, version, etc.)
+- A `content.html` file containing the widget's HTML content
+- Optional additional files (for React widgets, build configurations, etc.)
+
+The build script automatically scans all widgets, validates their configurations, and generates a unified `widget_registry.json` file that can be consumed by applications that need to display or manage these widgets.
+
 ## Overview
 
-The widget registry system uses individual configuration files for each widget, which are then automatically merged into a single `widget_registry.json` file using the `bin/build-registry.sh` script.
+The widget registry system uses individual configuration files for each widget, which are then automatically merged into a single `widget_registry.json` file using the `bin/build-registry.sh` script. This approach provides:
+
+- **Centralized Management**: All widgets are organized in the `widgets/` directory
+- **Automatic Validation**: The build script ensures all configurations are valid
+- **Version Control**: Each widget can be versioned independently
+- **Easy Maintenance**: Add, update, or remove widgets without manually editing the registry
 
 ## File Structure
 
@@ -24,6 +38,16 @@ widgets-repo-template/
         ├── widget.json
         └── content.html
 ```
+
+## Prerequisites
+
+Before creating widgets, ensure you have:
+
+- `jq` installed for JSON processing
+  - macOS: `brew install jq`
+  - Linux: `sudo apt-get install jq` or `sudo yum install jq`
+- Basic knowledge of HTML/CSS/JavaScript (depending on your widget type)
+- Git (for version control, if using)
 
 ## Configuration File
 
@@ -208,9 +232,11 @@ The build script validates:
 
 ### Script fails with "jq: command not found"
 
-Install jq:
+The build script requires `jq` for JSON processing. Install it:
+
 - **macOS**: `brew install jq`
 - **Linux**: `sudo apt-get install jq` or `sudo yum install jq`
+- **Windows**: Download from [jq's official website](https://stedolan.github.io/jq/download/)
 
 ### Script fails with "Missing required field"
 
@@ -237,5 +263,13 @@ Ensure your `widget.json` includes all required fields:
 
 ## Examples
 
-See the existing widgets for examples:
-- `widgets/demo_widget/` - Demo widget
+See the existing widgets in the `widgets/` directory for examples:
+
+- `widgets/demo_widget/` - A simple widget example with basic HTML content
+  - Demonstrates the minimal required structure: `widget.json` and `content.html`
+  - Good starting point for understanding the basic widget format
+
+- `widgets/react_hello_world/` - A React-based widget example using Vite
+  - Shows how to integrate a modern JavaScript framework
+  - Includes build configuration (`vite.config.ts`, `package.json`)
+  - Demonstrates how to bundle React components into a widget
