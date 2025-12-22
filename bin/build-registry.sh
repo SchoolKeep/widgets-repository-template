@@ -208,6 +208,7 @@ for widget_dir in "$WIDGETS_DIR"/*; do
     # Remove widget-level content fields if they were used (they belong in content object only, or are used for URL generation)
     del(.contentFile, .contentMethod, .requiresAuthentication, .cacheStrategy) |
     # Reorder fields: priority fields first, then the rest
+    # configuration and defaultConfig are optional fields for dynamic widget customization
     {
       title,
       description,
@@ -215,8 +216,12 @@ for widget_dir in "$WIDGETS_DIR"/*; do
       category,
       type,
       imageName,
-      content
-    } + .
+      content,
+      configuration,
+      defaultConfig
+    } + . |
+    # Remove null values from optional fields that were not provided
+    del(.configuration | nulls) | del(.defaultConfig | nulls)
     ')
   
   # Add to widgets array
