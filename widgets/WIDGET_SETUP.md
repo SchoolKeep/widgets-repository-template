@@ -164,7 +164,162 @@ Widget-specific configuration (only unique fields needed):
 **Optional fields:**
 - `category` - Widget category (default from config/defaults.json)
 - `imageName` - Image identifier (defaults to directory name)
+- `configuration` - Schema for user-configurable properties (see [Dynamic Widget Configuration](#dynamic-widget-configuration))
+- `defaultConfig` - Default values for configurable properties
 - Any other field from config/defaults.json can be overridden
+
+## Dynamic Widget Configuration
+
+Widgets can define configurable properties that allow users to customize widget behavior and appearance when adding the widget to a page. This is done through the `configuration` and `defaultConfig` fields in `widget.json`.
+
+### Configuration Schema
+
+The `configuration` field defines the blueprint for customizable properties:
+
+```json
+{
+  "configuration": {
+    "properties": {
+      "propertyName": {
+        "name": "propertyName",
+        "type": "text",
+        "label": "Display Label",
+        "defaultValue": "default value"
+      }
+    },
+    "required": ["propertyName"]
+  },
+  "defaultConfig": {
+    "propertyName": "default value"
+  }
+}
+```
+
+**Configuration Fields:**
+- `properties` - A map of configurable properties, each defined as a ConfigField
+- `required` - An array of property names that must be provided for a valid widget instance
+
+**ConfigField Required Properties:**
+- `name` - The property identifier (must match the key in properties map)
+- `type` - The field type (see supported types below)
+- `label` - Display label shown in the configuration UI
+- `defaultValue` - The default value for this property
+
+**defaultConfig:**
+- Initial default values for widget configuration properties
+- Applied automatically when a new widget instance is added to a layout
+- Values must match what's defined in the configuration schema
+
+### Supported ConfigField Types
+
+| Type | Description |
+|------|-------------|
+| `text` | Single line text input |
+| `number` | Numeric input field |
+| `color` | Color picker |
+
+### Template Variables in content.html
+
+When a widget has configuration properties, you can use template variables in `content.html` to render dynamic content. Template variables use double curly brace syntax: `{{ variable_name }}`.
+
+**Example content.html with template variables:**
+```html
+<style>
+  .banner {
+    background-color: {{ background_color }};
+    color: {{ text_color }};
+    padding: 20px;
+  }
+</style>
+<div class="banner">
+  <h1>{{ title }}</h1>
+  <p>{{ subtitle }}</p>
+</div>
+```
+
+The host application will replace these template variables with the actual configuration values when rendering the widget.
+
+### Complete Configurable Widget Example
+
+**widget.json:**
+```json
+{
+  "version": "1.0.0",
+  "title": "Card Grid",
+  "description": "A configurable card grid with dynamic layout and styling",
+  "category": "Content",
+  "imageName": "card_grid",
+  "configuration": {
+    "properties": {
+      "cards_per_row": {
+        "name": "cards_per_row",
+        "type": "number",
+        "label": "Cards Per Row",
+        "defaultValue": 3
+      },
+      "card_background": {
+        "name": "card_background",
+        "type": "color",
+        "label": "Card Background",
+        "defaultValue": "#ffffff"
+      },
+      "accent_color": {
+        "name": "accent_color",
+        "type": "color",
+        "label": "Accent Color",
+        "defaultValue": "#3b82f6"
+      },
+      "card_style": {
+        "name": "card_style",
+        "type": "text",
+        "label": "Card Style (flat, shadow, bordered)",
+        "defaultValue": "shadow"
+      }
+    },
+    "required": ["cards_per_row"]
+  },
+  "defaultConfig": {
+    "cards_per_row": 3,
+    "card_background": "#ffffff",
+    "accent_color": "#3b82f6",
+    "card_style": "shadow"
+  }
+}
+```
+
+**content.html:**
+```html
+<style>
+  /* Grid columns use the number config */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat({{ cards_per_row }}, 1fr);
+    gap: 20px;
+  }
+
+  /* Colors come from color configs */
+  .card {
+    background-color: {{ card_background }};
+    padding: 24px;
+    border-radius: 8px;
+  }
+
+  /* Select config creates class variants */
+  .card-style-shadow .card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .card-style-bordered .card {
+    border: 2px solid {{ accent_color }};
+  }
+</style>
+
+<!-- Config values combined into class names -->
+<div class="card-grid card-style-{{ card_style }}">
+  <div class="card">Card 1</div>
+  <div class="card">Card 2</div>
+  <div class="card">Card 3</div>
+</div>
+```
 
 ## Creating a New Widget
 
@@ -345,4 +500,10 @@ See the existing widgets in the `widgets/` directory for examples:
   - Shows how to integrate a modern JavaScript framework
   - Includes build configuration (`vite.config.ts`, `package.json`)
   - Demonstrates how to bundle React components into a widget
+
+- `widgets/card_grid/` - A configurable card grid widget with dynamic layout and styling
+  - Demonstrates the `configuration` and `defaultConfig` fields
+  - Shows how to use template variables (`{{ variable_name }}`) in content.html
+  - Includes multiple configuration types: number, color, and select
+  - Well-commented HTML showing exactly how each config variable is used
 
