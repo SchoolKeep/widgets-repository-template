@@ -14,52 +14,52 @@
         "cacheStrategy": "no-cache"
       },
       "configuration": {
-        "properties": {
-          "cards_per_row": {
+        "properties": [
+          {
             "name": "cards_per_row",
             "type": "number",
             "label": "Cards Per Row",
-            "defaultValue": 3
+            "defaultValue": 3,
+            "rules": {
+              "required": true
+            }
           },
-          "card_background": {
+          {
             "name": "card_background",
             "type": "color",
             "label": "Card Background",
             "defaultValue": "#ffffff"
           },
-          "card_text_color": {
+          {
             "name": "card_text_color",
             "type": "color",
             "label": "Text Color",
             "defaultValue": "#1f2937"
           },
-          "accent_color": {
+          {
             "name": "accent_color",
             "type": "color",
             "label": "Accent Color",
             "defaultValue": "#3b82f6"
           },
-          "title_size": {
+          {
             "name": "title_size",
             "type": "text",
             "label": "Title Size (small, medium, large)",
             "defaultValue": "medium"
           },
-          "card_style": {
+          {
             "name": "card_style",
             "type": "text",
             "label": "Card Style (flat, shadow, bordered)",
             "defaultValue": "shadow"
           },
-          "show_icons": {
+          {
             "name": "show_icons",
             "type": "text",
             "label": "Show Icons (yes, no)",
             "defaultValue": "yes"
           }
-        },
-        "required": [
-          "cards_per_row"
         ]
       },
       "defaultConfig": {
