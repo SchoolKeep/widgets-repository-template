@@ -52,6 +52,13 @@
   }
 }
 
+.hello-world-logo {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+}
+
 .hello-world-title {
   position: relative;
   margin: 0;

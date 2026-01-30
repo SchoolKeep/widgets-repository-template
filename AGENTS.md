@@ -223,6 +223,53 @@ For React/Vue/other frameworks, ensure build outputs HTML fragment:
 - No external file references (except absolute URLs)
 - Output must be embeddable HTML fragment
 
+### 5.1 External Assets with `/__BASE_URL__`
+
+Widgets can include external assets (images, fonts, etc.) that are served from a CDN. Use the `/__BASE_URL__` placeholder prefix for all external asset references. The backend will replace this placeholder with the actual CDN URL at runtime.
+
+**Directory Structure:**
+```
+widgets/<widget_name>/
+├── content.html
+├── widget.json
+└── images/
+    └── my-image.svg
+```
+
+**For Simple HTML Widgets:**
+
+Reference assets directly in `content.html` with the `/__BASE_URL__` prefix:
+
+```html
+<img src="/__BASE_URL__/images/my-image.svg" alt="My image" />
+```
+
+See `widgets/demo_widget/` for a complete example.
+
+**For React/Vite Widgets:**
+
+Use standard ES imports for images from the `images/` folder. The build configuration automatically prefixes them with `/__BASE_URL__`:
+
+```tsx
+import myImage from "../images/my-image.svg";
+
+export function MyComponent() {
+  return <img src={myImage} alt="My image" />;
+}
+```
+
+The build outputs:
+- `content.html` - inlined JS/CSS with `/__BASE_URL__/images/...` for images
+- `images/` folder - contains image assets
+
+See `widgets/react_hello_world/vite.config.ts` for a complete example.
+
+**Key Points:**
+- For simple HTML widgets, manually use `/__BASE_URL__` prefix for images
+- For React/Vite widgets, use standard ES imports (automatic `/__BASE_URL__` prefixing)
+- The backend uploads images to CDN and replaces `/__BASE_URL__` with the CDN URL
+- JS and CSS are inlined into `content.html`
+
 ### 6. Best Practices
 
 **Naming:**
