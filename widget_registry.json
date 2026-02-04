@@ -1,116 +1,11 @@
 {
   "widgets": [
     {
-      "title": "Card Grid",
-      "description": "A configurable card grid widget demonstrating dynamic layout and styling options",
       "version": "1.0.0",
-      "category": "Demo",
-      "type": "card_grid",
-      "imageName": "banner",
-      "content": {
-        "endpoint": "./widgets/card_grid/content.html",
-        "method": "GET",
-        "requiresAuthentication": false,
-        "cacheStrategy": "no-cache"
-      },
-      "configuration": {
-        "properties": [
-          {
-            "name": "cards_per_row",
-            "type": "number",
-            "label": "Cards Per Row",
-            "defaultValue": 3,
-            "rules": {
-              "required": true,
-              "minimum": 1,
-              "maximum": 6
-            }
-          },
-          {
-            "name": "card_background",
-            "type": "color",
-            "label": "Card Background",
-            "defaultValue": "#ffffff"
-          },
-          {
-            "name": "card_text_color",
-            "type": "color",
-            "label": "Text Color",
-            "defaultValue": "#1f2937"
-          },
-          {
-            "name": "accent_color",
-            "type": "color",
-            "label": "Accent Color",
-            "defaultValue": "#3b82f6"
-          },
-          {
-            "name": "title_size",
-            "type": "select",
-            "label": "Title Size",
-            "defaultValue": "medium",
-            "options": [
-              {
-                "value": "small",
-                "label": "Small"
-              },
-              {
-                "value": "medium",
-                "label": "Medium"
-              },
-              {
-                "value": "large",
-                "label": "Large"
-              }
-            ]
-          },
-          {
-            "name": "card_style",
-            "type": "select",
-            "label": "Card Style",
-            "defaultValue": "shadow",
-            "options": [
-              {
-                "value": "flat",
-                "label": "Flat"
-              },
-              {
-                "value": "shadow",
-                "label": "Shadow"
-              },
-              {
-                "value": "bordered",
-                "label": "Bordered"
-              }
-            ]
-          },
-          {
-            "name": "show_icons",
-            "type": "select",
-            "label": "Show Icons",
-            "defaultValue": "yes",
-            "options": [
-              {
-                "value": "yes",
-                "label": "Yes"
-              },
-              {
-                "value": "no",
-                "label": "No"
-              }
-            ]
-          }
-        ]
-      },
-      "defaultConfig": {
-        "cards_per_row": 3,
-        "card_background": "#ffffff",
-        "card_text_color": "#1f2937",
-        "accent_color": "#3b82f6",
-        "title_size": "medium",
-        "card_style": "shadow",
-        "show_icons": "yes"
-      },
+      "title": "Bundled React Test",
+      "type": "bundled_react_test",
+      "description": "Tests Vite-bundled React code with code splitting and asset references",
+      "category": "Path Tests",
       "containers": [
         "Full width"
       ],
@@ -120,22 +15,19 @@
         "editable": true,
         "removable": true,
         "shared": false,
-        "movable": false
+        "movable": true
+      },
+      "source": {
+        "path": "widgets/bundled_react_test/dist",
+        "entry": "content.html"
       }
     },
     {
-      "title": "Demo widget",
-      "description": "Demo widget for presentation purposes",
       "version": "1.0.0",
-      "category": "Demo",
-      "type": "demo_widget",
-      "imageName": "demo_widget",
-      "content": {
-        "endpoint": "./widgets/demo_widget/content.html",
-        "method": "GET",
-        "requiresAuthentication": false,
-        "cacheStrategy": "no-cache"
-      },
+      "title": "CSS Paths Test",
+      "type": "css_paths_test",
+      "description": "Tests CSS path mechanisms including url(), @import, @font-face, and image-set()",
+      "category": "Path Tests",
       "containers": [
         "Full width"
       ],
@@ -145,22 +37,19 @@
         "editable": true,
         "removable": true,
         "shared": false,
-        "movable": false
+        "movable": true
+      },
+      "source": {
+        "path": "widgets/css_paths_test/dist",
+        "entry": "content.html"
       }
     },
     {
-      "title": "Hello World Widget",
-      "description": "A simple React widget displaying Hello World with custom styling",
       "version": "1.0.0",
-      "category": "Demo",
-      "type": "react_hello_world",
-      "imageName": "react_hello_world",
-      "content": {
-        "endpoint": "./widgets/react_hello_world/content.html",
-        "method": "GET",
-        "requiresAuthentication": false,
-        "cacheStrategy": "no-cache"
-      },
+      "title": "HTML Paths Test",
+      "type": "html_paths_test",
+      "description": "Tests HTML attribute path references that need CDN URL rewriting",
+      "category": "Path Tests",
       "containers": [
         "Full width"
       ],
@@ -170,7 +59,33 @@
         "editable": true,
         "removable": true,
         "shared": false,
-        "movable": false
+        "movable": true
+      },
+      "source": {
+        "path": "widgets/html_paths_test/dist",
+        "entry": "content.html"
+      }
+    },
+    {
+      "version": "1.0.0",
+      "title": "JavaScript Paths Test",
+      "type": "js_paths_test",
+      "description": "Tests JavaScript runtime path references including fetch(), import(), Worker, etc.",
+      "category": "Path Tests",
+      "containers": [
+        "Full width"
+      ],
+      "widgetsLibrary": true,
+      "settings": {
+        "configurable": true,
+        "editable": true,
+        "removable": true,
+        "shared": false,
+        "movable": true
+      },
+      "source": {
+        "path": "widgets/js_paths_test/dist",
+        "entry": "content.html"
       }
     }
   ]

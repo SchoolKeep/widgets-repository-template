@@ -4,16 +4,18 @@ This guide explains how to create and manage widgets in the widgets repository.
 
 ## What is This?
 
-This repository provides a system for managing widget configurations. Each widget is defined by:
+This repository provides a system for managing widget configurations using the Widget Platform's `source` block pattern. Each widget is defined by:
+
 - A `widget.json` configuration file with metadata (title, description, version, etc.)
-- A `content.html` file containing the widget's complete content (HTML, CSS, and JavaScript)
-- Optional additional files (for React widgets, build configurations, etc.)
+- Content files in one of two patterns:
+  - **Simple widget**: A single `content.html` file directly in the widget directory
+  - **Multi-file widget**: A `dist/` directory containing `content.html` and related assets (CSS, JS, images)
 
-**Important**: The `content.html` file must be completely self-contained. All HTML, CSS, and JavaScript must be included directly in this file. **Relative file references** (such as `<link rel="stylesheet" href="styles.css">` or `<script src="script.js">`) will not work, as the widget system only serves the `content.html` file itself. However, **publicly available endpoints** (absolute URLs like `https://cdn.example.com/style.css` or `https://fonts.googleapis.com/css2?family=...`) are accessible and can be used.
+**Embedding Requirement**: Widgets are embedded into existing HTML pages, so the entry `content.html` file must be an HTML fragment. Do not include `<html>`, `<head>`, or `<body>` tags, as these will conflict with the host page structure.
 
-**Embedding Requirement**: Widgets are embedded into existing HTML pages, so the `content.html` file must be an HTML fragment. Do not include `<html>`, `<head>`, or `<body>` tags, as these will conflict with the host page structure.
+**Multi-file widgets**: For widgets with separate CSS, JavaScript, or image files, place them in a `dist/` directory. The platform automatically transforms relative paths to hosted URLs after publishing.
 
-The build script automatically scans all widgets, validates their configurations, and generates a unified `widget_registry.json` file that can be consumed by applications that need to display or manage these widgets.
+The build script automatically scans all widgets, validates their configurations, and generates a unified `widget_registry.json` file using the `source` block pattern.
 
 ## Overview
 
@@ -35,12 +37,16 @@ widgets-repo-template/
 ├── widget_registry.json     # Generated registry (DO NOT EDIT MANUALLY)
 └── widgets/
     ├── WIDGET_SETUP.md      # This documentation file
-    ├── my_widget/
-    │   ├── widget.json      # Widget-specific configuration
-    │   └── content.html     # Widget HTML content
-    └── another_widget/
+    ├── simple_widget/       # Simple single-file widget
+    │   ├── widget.json
+    │   └── content.html
+    └── multi_file_widget/   # Multi-file widget with assets
         ├── widget.json
-        └── content.html
+        └── dist/
+            ├── content.html # Entry point
+            └── assets/
+                ├── styles.css
+                └── script.js
 ```
 
 ## Prerequisites
@@ -55,18 +61,18 @@ Before creating widgets, ensure you have:
 
 ## Content File Requirements
 
-### content.html
+### Simple Widgets (Single File)
 
-The `content.html` file is the single source of truth for your widget's content. **All HTML, CSS, and JavaScript must be included directly in this file.**
+For simple widgets, the `content.html` file contains all HTML, CSS, and JavaScript inline.
 
 **Critical Requirements:**
-- **HTML Fragment**: Widgets are embedded into existing pages, so do not include `<html>`, `<head>`, or `<body>` tags
-- **Self-contained**: All styles must be in `<style>` tags within the HTML fragment, or use publicly available CDN resources
-- **Inline JavaScript**: All scripts must be in `<script>` tags within the HTML fragment, or use publicly available CDN resources
-- **No relative file references**: Relative file references (e.g., `href="styles.css"`, `src="./script.js"`, `src="../lib.js"`) will not work, as the widget system only serves the `content.html` file itself
-- **Public endpoints are accessible**: Absolute URLs to publicly available resources (e.g., `https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css`, `https://fonts.googleapis.com/css2?family=...`) will work and can be used
 
-**Example of correct structure (with inline styles/scripts):**
+- **HTML Fragment**: Do not include `<html>`, `<head>`, or `<body>` tags
+- **Self-contained**: All styles in `<style>` tags, all scripts in `<script>` tags
+- **Public endpoints are accessible**: Absolute URLs (CDNs, fonts, etc.) are allowed
+
+**Example of simple widget structure:**
+
 ```html
 <style>
   .my-widget {
@@ -78,45 +84,56 @@ The `content.html` file is the single source of truth for your widget's content.
   <h1>My Widget</h1>
 </div>
 <script>
-  console.log('Widget loaded');
+  console.log("Widget loaded");
 </script>
 ```
 
-**Example using publicly available resources:**
+### Multi-File Widgets (with dist/ directory)
+
+For widgets that need separate CSS, JavaScript, or image files, use a `dist/` directory structure.
+
+**Critical Requirements:**
+
+- Entry file (`content.html`) must be an HTML fragment (no `<html>`, `<head>`, `<body>` tags)
+- Use relative paths to reference assets in the same directory
+- The platform automatically transforms relative paths to hosted URLs after publishing
+
+**Example multi-file widget structure:**
+
+```
+my_widget/
+├── widget.json
+└── dist/
+    ├── content.html
+    └── assets/
+        ├── styles.css
+        ├── script.js
+        └── logo.png
+```
+
+**Example content.html with relative asset references:**
+
 ```html
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-<style>
-  .my-widget {
-    font-family: 'Roboto', sans-serif;
-    color: blue;
-    padding: 20px;
-  }
-</style>
+<link rel="stylesheet" href="assets/styles.css" />
 <div class="my-widget">
+  <img src="assets/logo.png" alt="Logo" />
   <h1>My Widget</h1>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
-<script>
-  console.log('Widget loaded with lodash:', _.VERSION);
-</script>
+<script src="assets/script.js"></script>
 ```
 
 **For React/Modern Frameworks:**
-If you're using a build tool (like Vite, Webpack, etc.), ensure your build process bundles all dependencies and outputs a single, self-contained HTML fragment. The build output should include all CSS and JavaScript inline or embedded, not as separate files. The output must be an HTML fragment (no `<html>`, `<head>`, or `<body>` tags) that can be embedded into existing pages.
+If you're using a build tool (like Vite, Webpack, etc.), configure it to output to the `dist/` directory. The entry file should be `content.html` as an HTML fragment. See `widgets/bundled_react_test/` for a Vite example.
 
 ## Configuration File
 
 ### defaults.json
 
-This file contains both global configuration and default values for all widgets:
+This file contains default values for all widgets:
 
 ```json
 {
-  "visibility": "private",
-  "contentFile": "content.html",
-  "contentMethod": "GET",
-  "requiresAuthentication": false,
-  "cacheStrategy": "no-cache",
+  "sourceEntry": "content.html",
   "containers": ["Full width"],
   "widgetsLibrary": true,
   "settings": {
@@ -124,23 +141,22 @@ This file contains both global configuration and default values for all widgets:
     "editable": true,
     "removable": true,
     "shared": false,
-    "movable": false
+    "movable": true
   }
 }
 ```
 
-**Global Configuration Fields:**
-- `visibility` - Endpoint generation mode (must be `"private"`)
-  - Generates relative paths (e.g., `./widgets/demo_widget/content.html`)
-- `contentFile` - Name of the HTML content file (default: "content.html")
-- `contentMethod` - HTTP method for fetching content (default: "GET")
-- `requiresAuthentication` - Whether content requires auth (default: false)
-- `cacheStrategy` - Cache strategy for content (default: "no-cache")
+**Configuration Fields:**
 
-**Widget Default Fields:**
-- `containers` - Available container types
-- `widgetsLibrary` - Whether widget appears in library
-- `settings` - Default widget behavior settings
+- `sourceEntry` - Default entry file name (default: "content.html")
+- `containers` - Available container types for widget placement
+- `widgetsLibrary` - Whether widget appears in the widget library
+- `settings` - Default widget behavior settings:
+  - `configurable` - Whether users can configure the widget after adding it
+  - `editable` - Whether the widget content can be edited
+  - `removable` - Whether users can remove the widget from pages
+  - `shared` - Whether the widget is shared across pages
+  - `movable` - Whether users can reposition the widget
 
 ### widget.json
 
@@ -157,13 +173,18 @@ Widget-specific configuration (only unique fields needed):
 ```
 
 **Required fields:**
+
 - `version` - Semantic version (e.g., "1.0.0")
 - `title` - Display name of the widget
 - `description` - Brief description of the widget
 
 **Optional fields:**
-- `category` - Widget category (default from config/defaults.json)
-- `imageName` - Image identifier (defaults to directory name)
+
+- `category` - Widget category for organization
+- `imageName` - Image identifier for widget thumbnail
+- `imageSrc` - URL or path to thumbnail image
+- `sourcePath` - Override the auto-detected source path (e.g., "widgets/my_widget/build")
+- `sourceEntry` - Override the default entry file name (e.g., "index.html")
 - `configuration` - Schema for user-configurable properties (see [Dynamic Widget Configuration](#dynamic-widget-configuration))
 - `defaultConfig` - Default values for configurable properties
 - Any other field from config/defaults.json can be overridden
@@ -200,40 +221,45 @@ The `configuration` field defines the blueprint for customizable properties:
 ```
 
 **Configuration Fields:**
+
 - `properties` - An array of ConfigField definitions
 
 **ConfigField Required Properties:**
+
 - `name` - The property identifier used in `content.html` template variables
 - `label` - Display label shown in the configuration UI
 - `type` - The field type (see supported types below)
 
 **ConfigField Optional Properties:**
+
 - `description` - Helper text for the configuration UI
 - `defaultValue` - Default value shown in the configuration UI
 - `rules` - Validation rules such as `required`, `minLength`, `maxLength`, `minimum`, and `maximum`
 - `options` - Required for `select` fields, array of `{ "value", "label" }`
 
 **defaultConfig:**
+
 - Initial default values for widget configuration properties
 - Applied automatically when a new widget instance is added to a layout
 - Values must match the field names defined in `configuration.properties`
 
 ### Supported ConfigField Types
 
-| Type | Description |
-|------|-------------|
-| `text` | Single line text input |
-| `number` | Numeric input field |
-| `color` | Color picker |
-| `date` | Date picker |
-| `boolean` | Checkbox or toggle |
-| `select` | Select dropdown |
+| Type      | Description            |
+| --------- | ---------------------- |
+| `text`    | Single line text input |
+| `number`  | Numeric input field    |
+| `color`   | Color picker           |
+| `date`    | Date picker            |
+| `boolean` | Checkbox or toggle     |
+| `select`  | Select dropdown        |
 
 ### Template Variables in content.html
 
 When a widget has configuration properties, you can use template variables in `content.html` to render dynamic content. Template variables use double curly brace syntax: `{{ variable_name }}`.
 
 **Example content.html with template variables:**
+
 ```html
 <style>
   .banner {
@@ -253,6 +279,7 @@ The host application will replace these template variables with the actual confi
 ### Complete Configurable Widget Example
 
 **widget.json:**
+
 ```json
 {
   "version": "1.0.0",
@@ -308,6 +335,7 @@ The host application will replace these template variables with the actual confi
 ```
 
 **content.html:**
+
 ```html
 <style>
   .card-grid {
@@ -339,25 +367,28 @@ The host application will replace these template variables with the actual confi
 
 ## Creating a New Widget
 
+### Option A: Simple Single-File Widget
+
 1. **Create a new directory** in `widgets/`:
+
    ```bash
    mkdir widgets/my_new_widget
    ```
 
 2. **Create `widget.json`** with your widget configuration:
+
    ```bash
    cat > widgets/my_new_widget/widget.json << 'EOF'
    {
      "version": "1.0.0",
      "title": "My New Widget",
      "description": "A widget that does amazing things",
-     "category": "Demo",
-     "imageName": "my_new_widget"
+     "category": "Demo"
    }
    EOF
    ```
 
-3. **Create `content.html`** with your widget HTML fragment (including all CSS and JavaScript):
+3. **Create `content.html`** with your widget HTML fragment (all CSS and JavaScript inline):
    ```bash
    cat > widgets/my_new_widget/content.html << 'EOF'
    <style>
@@ -375,13 +406,43 @@ The host application will replace these template variables with the actual confi
    </script>
    EOF
    ```
-   
-   **Remember**: 
-   - Relative file references (e.g., `href="styles.css"`, `src="./script.js"`) will not work
-   - Publicly available endpoints (absolute URLs like `https://cdn.example.com/style.css`) are accessible and can be used
-   - Do not include `<html>`, `<head>`, or `<body>` tags, as widgets are embedded into existing pages
+
+### Option B: Multi-File Widget (with separate assets)
+
+1. **Create directory structure**:
+
+   ```bash
+   mkdir -p widgets/my_new_widget/dist/assets
+   ```
+
+2. **Create `widget.json`**:
+
+   ```bash
+   cat > widgets/my_new_widget/widget.json << 'EOF'
+   {
+     "version": "1.0.0",
+     "title": "My New Widget",
+     "description": "A widget with separate assets",
+     "category": "Demo"
+   }
+   EOF
+   ```
+
+3. **Create entry file and assets**:
+   ```bash
+   cat > widgets/my_new_widget/dist/content.html << 'EOF'
+   <link rel="stylesheet" href="assets/styles.css">
+   <div class="my-widget">
+     <h1>My New Widget</h1>
+   </div>
+   <script src="assets/script.js"></script>
+   EOF
+   ```
+
+### Build and Commit
 
 4. **Build the registry**:
+
    ```bash
    ./bin/build-registry.sh
    ```
@@ -400,6 +461,7 @@ The host application will replace these template variables with the actual confi
    - Or modify `widgets/my_widget/content.html`
 
 2. **Rebuild the registry**:
+
    ```bash
    ./bin/build-registry.sh
    ```
@@ -417,56 +479,68 @@ The host application will replace these template variables with the actual confi
 The `bin/build-registry.sh` script supports several options:
 
 ### Standard Build
+
 ```bash
 ./bin/build-registry.sh
 ```
+
 Generates `widget_registry.json` from all widget configurations.
 
 ### Dry Run
+
 ```bash
 ./bin/build-registry.sh --dry-run
 ```
+
 Preview the output without writing to the file.
 
 ### Validate
+
 ```bash
 ./bin/build-registry.sh --validate
 ```
+
 Validates the existing `widget_registry.json` file.
 
 ### Help
+
 ```bash
 ./bin/build-registry.sh --help
 ```
+
 Display usage information.
 
 ## How It Works
 
-1. **Reads** global configuration from `config/defaults.json`
+1. **Reads** default configuration from `config/defaults.json`
 2. **Scans** the `widgets/` directory for subdirectories
 3. **Reads** each widget's `widget.json` configuration
-4. **Merges** widget-specific defaults and config:
-   - Widget-specific default values from `config/defaults.json` (excludes global config fields)
+4. **Detects** widget structure:
+   - If `dist/` directory exists, uses it as the source path
+   - Otherwise, uses the widget directory directly
+5. **Merges** widget-specific defaults and config:
+   - Default values from `config/defaults.json`
    - Widget-specific values from `widget.json`
-   - Auto-generated values (type, endpoint URL)
-5. **Validates** required fields are present
-6. **Generates** the final `widget_registry.json`
+   - Auto-generated values (type, source block)
+6. **Validates** required fields and entry file exist
+7. **Generates** the final `widget_registry.json` with `source` blocks
 
 ### Auto-Generated Fields
 
 - `type`: Derived from the directory name (e.g., `my_widget`)
-- `content.endpoint`: Generated as a relative path
-  - Format: `./widgets/{type}/content.html`
-  - Uses relative paths for local widget content
+- `source.path`: Auto-detected based on widget structure:
+  - `widgets/{type}/dist` if `dist/` directory exists
+  - `widgets/{type}` otherwise
+- `source.entry`: From `sourceEntry` in widget.json or defaults (default: "content.html")
 
 ## Validation Rules
 
 The build script validates:
 
-- Required files exist (`widget.json`, `content.html`)
-- JSON is valid
+- `widget.json` exists and is valid JSON
 - Required fields are present (`version`, `title`, `description`)
-- Generated registry is valid JSON
+- Entry file exists (in `dist/` or widget root depending on structure)
+- Generated registry is valid JSON with `source` blocks
 
 ## Troubleshooting
 
@@ -481,6 +555,7 @@ The build script requires `jq` for JSON processing. Install it:
 ### Script fails with "Missing required field"
 
 Ensure your `widget.json` includes all required fields:
+
 - `version`
 - `title`
 - `description`
@@ -489,7 +564,9 @@ Ensure your `widget.json` includes all required fields:
 
 1. Check directory structure is correct
 2. Verify `widget.json` exists and is valid JSON
-3. Verify `content.html` exists
+3. Verify entry file exists:
+   - For simple widgets: `content.html` in widget directory
+   - For multi-file widgets: `dist/content.html`
 4. Run with `--dry-run` to see detailed error messages
 
 ## Best Practices
@@ -500,9 +577,11 @@ Ensure your `widget.json` includes all required fields:
 4. **Don't edit `widget_registry.json` manually** - it will be overwritten
 5. **Keep widget names simple** - they become the `type` field (use lowercase, underscores)
 6. **Test locally** with `--dry-run` before pushing
-7. **Keep content.html self-contained** - Include all CSS and JavaScript inline, or use publicly available CDN resources; avoid relative file references
-8. **Use HTML fragments only** - Do not include `<html>`, `<head>`, or `<body>` tags, as widgets are embedded into existing pages
-9. **Use absolute URLs for external resources** - Relative file references won't work, but publicly available endpoints (CDNs, fonts, etc.) are accessible
+7. **Use HTML fragments only** - Do not include `<html>`, `<head>`, or `<body>` tags
+8. **Choose the right structure**:
+   - Simple widgets: single `content.html` with inline CSS/JS
+   - Multi-file widgets: `dist/` directory with separate assets
+9. **Use absolute URLs for external resources** - CDNs, fonts, etc. are always accessible
 
 ## Examples
 
@@ -512,14 +591,18 @@ See the existing widgets in the `widgets/` directory for examples:
   - Demonstrates the minimal required structure: `widget.json` and `content.html`
   - Good starting point for understanding the basic widget format
 
-- `widgets/react_hello_world/` - A React-based widget example using Vite
-  - Shows how to integrate a modern JavaScript framework
-  - Includes build configuration (`vite.config.ts`, `package.json`)
-  - Demonstrates how to bundle React components into a widget
-
 - `widgets/card_grid/` - A configurable card grid widget with dynamic layout and styling
   - Demonstrates the `configuration` and `defaultConfig` fields
   - Shows how to use template variables (`{{ variable_name }}`) in content.html
   - Includes multiple configuration types: number, color, and select
-  - Well-commented HTML showing exactly how each config variable is used
 
+- `widgets/html_paths_test/` - A multi-file widget with separate assets
+  - Demonstrates the `dist/` directory structure
+  - Shows how to reference CSS, JS, and images with relative paths
+
+- `widgets/bundled_react_test/` - A React-based widget example using Vite
+  - Shows how to integrate a modern JavaScript framework
+  - Includes build configuration (`vite.config.ts`, `package.json`)
+  - Outputs to `dist/` directory with proper structure
+
+For detailed schema documentation, see https://widget-service.insided.com/docs/custom-widgets/widget-schema.html
