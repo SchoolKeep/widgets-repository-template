@@ -22,15 +22,19 @@ function extractFragment() {
       const linkMatches =
         html.match(/<link[^>]*rel=["']stylesheet["'][^>]*>/gi) || [];
 
-      const rootMatch = html.match(/<div id="root"><\/div>/);
-      const rootDiv = rootMatch ? rootMatch[0] : '<div id="root"></div>';
+      const rootMatch = html.match(/<div id="bundled-react-test-root"><\/div>/);
+      const rootDiv = rootMatch
+        ? rootMatch[0]
+        : '<div id="bundled-react-test-root"></div>';
 
       const fragment = [
         ...linkMatches,
         ...styleMatches,
         rootDiv,
         ...scriptMatches,
-      ].join("\n");
+      ]
+        .join("\n")
+        .replace(/\s*crossorigin/g, "");
 
       writeFileSync(outputPath, fragment);
       console.log("✓ Built content.html");
