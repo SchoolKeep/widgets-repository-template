@@ -1,18 +1,7 @@
 {
   "widgets": [
     {
-      "title": "Card Grid",
-      "description": "A configurable card grid widget demonstrating dynamic layout and styling options",
-      "version": "1.0.0",
       "category": "Demo",
-      "type": "card_grid",
-      "imageName": "banner",
-      "content": {
-        "endpoint": "./widgets/card_grid/content.html",
-        "method": "GET",
-        "requiresAuthentication": false,
-        "cacheStrategy": "no-cache"
-      },
       "configuration": {
         "properties": [
           {
@@ -102,6 +91,9 @@
           }
         ]
       },
+      "containers": [
+        "Full width"
+      ],
       "defaultConfig": {
         "cards_per_row": 3,
         "card_background": "#ffffff",
@@ -111,67 +103,69 @@
         "card_style": "shadow",
         "show_icons": "yes"
       },
-      "containers": [
-        "Full width"
-      ],
-      "widgetsLibrary": true,
+      "description": "A configurable card grid widget demonstrating dynamic layout and styling options",
       "settings": {
         "configurable": true,
         "editable": true,
         "removable": true,
         "shared": false,
         "movable": false
-      }
+      },
+      "title": "Card Grid",
+      "version": "1.0.0",
+      "widgetsLibrary": true,
+      "type": "card_grid",
+      "source": {
+        "path": "widgets/card_grid/dist",
+        "entry": "content.html"
+      },
+      "imageSrc": "widgets/card_grid/thumbnail.png"
     },
     {
-      "title": "Demo widget",
+      "category": "Demo",
+      "containers": [
+        "Full width"
+      ],
       "description": "Demo widget for presentation purposes",
-      "version": "1.0.0",
-      "category": "Demo",
-      "type": "demo_widget",
-      "imageName": "demo_widget",
-      "content": {
-        "endpoint": "./widgets/demo_widget/content.html",
-        "method": "GET",
-        "requiresAuthentication": false,
-        "cacheStrategy": "no-cache"
-      },
-      "containers": [
-        "Full width"
-      ],
-      "widgetsLibrary": true,
       "settings": {
         "configurable": true,
         "editable": true,
         "removable": true,
         "shared": false,
         "movable": false
-      }
+      },
+      "title": "Demo widget",
+      "version": "1.0.0",
+      "widgetsLibrary": true,
+      "type": "demo_widget",
+      "source": {
+        "path": "widgets/demo_widget/dist",
+        "entry": "content.html"
+      },
+      "imageSrc": "widgets/demo_widget/thumbnail.png"
     },
     {
-      "title": "Hello World Widget",
-      "description": "A simple React widget displaying Hello World with custom styling",
-      "version": "1.0.0",
       "category": "Demo",
-      "type": "react_hello_world",
-      "imageName": "react_hello_world",
-      "content": {
-        "endpoint": "./widgets/react_hello_world/content.html",
-        "method": "GET",
-        "requiresAuthentication": false,
-        "cacheStrategy": "no-cache"
-      },
       "containers": [
         "Full width"
       ],
-      "widgetsLibrary": true,
+      "description": "A simple React widget displaying Hello World with custom styling",
       "settings": {
         "configurable": true,
         "editable": true,
         "removable": true,
         "shared": false,
         "movable": false
-      }
+      },
+      "title": "Hello World Widget",
+      "version": "1.0.0",
+      "widgetsLibrary": true,
+      "type": "react_hello_world",
+      "source": {
+        "path": "widgets/react_hello_world/dist",
+        "entry": "content.html"
+      },
+      "imageSrc": "widgets/react_hello_world/thumbnail.png"
     }
   ]
 }

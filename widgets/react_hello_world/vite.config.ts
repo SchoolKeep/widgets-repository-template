@@ -13,7 +13,7 @@ function extractFragment() {
     writeBundle() {
       const distPath = resolve(__dirname, "dist/index.html");
       const cssPath = resolve(__dirname, "src/App.css");
-      const outputPath = resolve(__dirname, "content.html");
+      const outputPath = resolve(__dirname, "dist/content.html");
 
       const html = readFileSync(distPath, "utf-8");
       const css = readFileSync(cssPath, "utf-8");
@@ -24,7 +24,7 @@ function extractFragment() {
       const fragment = `<style>${css}</style>\n<hello-world-widget></hello-world-widget>\n<script>${scriptContent}</script>`;
 
       writeFileSync(outputPath, fragment);
-      console.log("✓ Built content.html");
+      console.log("✓ Built dist/content.html");
     },
   };
 }

@@ -1,22 +1,35 @@
 #!/bin/bash
 
 # build-registry.sh
-# Script to generate widget_registry.json from individual widget configs
+# Generates widget_registry.json by deep-merging the default widget template
+# with each widgets/<name>/widget.json, resolving paths from widget-dir-relative
+# to repository-root-relative. Each widget.json must include either a "source"
+# block (repo-hosted) or a "content" block (external).
 
 set -e
 
-# Colors for output
+# -----------------------------------------------------------------------------
+# Defaults (widget template + content-block). Edit here; no external config file.
+# -----------------------------------------------------------------------------
+
+DEFAULT_CONTAINERS='["Full width"]'
+DEFAULT_WIDGETS_LIBRARY="true"
+DEFAULT_SETTINGS='{"configurable":true,"editable":true,"removable":true,"shared":false,"movable":false}'
+
+CONTENT_DEFAULT_METHOD="GET"
+CONTENT_DEFAULT_REQUIRES_AUTH="false"
+CONTENT_DEFAULT_CACHE_STRATEGY="no-cache"
+
+# -----------------------------------------------------------------------------
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Configuration
 WIDGETS_DIR="widgets"
-DEFAULTS_FILE="config/defaults.json"
 OUTPUT_FILE="widget_registry.json"
 
-# Parse command line arguments
 DRY_RUN=false
 VALIDATE_ONLY=false
 
@@ -47,22 +60,18 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Function to print error messages
 error() {
   echo -e "${RED}ERROR:${NC} $1" >&2
 }
 
-# Function to print success messages
 success() {
   echo -e "${GREEN}SUCCESS:${NC} $1"
 }
 
-# Function to print warning messages
 warning() {
   echo -e "${YELLOW}WARNING:${NC} $1"
 }
 
-# Check if jq is installed
 if ! command -v jq &> /dev/null; then
   error "jq is required but not installed. Please install it:"
   echo "  macOS: brew install jq"
@@ -70,30 +79,44 @@ if ! command -v jq &> /dev/null; then
   exit 1
 fi
 
-# Validate mode
 if [ "$VALIDATE_ONLY" = true ]; then
   if [ ! -f "$OUTPUT_FILE" ]; then
     error "File $OUTPUT_FILE does not exist"
     exit 1
   fi
-  
-  if jq empty "$OUTPUT_FILE" 2>/dev/null; then
-    success "Valid JSON in $OUTPUT_FILE"
-    
-    # Check structure
-    widget_count=$(jq '.widgets | length' "$OUTPUT_FILE")
-    success "Found $widget_count widgets in registry"
-    exit 0
-  else
+  if ! jq empty "$OUTPUT_FILE" 2>/dev/null; then
     error "Invalid JSON in $OUTPUT_FILE"
     exit 1
   fi
-fi
-
-# Check required files
-if [ ! -f "$DEFAULTS_FILE" ]; then
-  error "Defaults file $DEFAULTS_FILE not found"
-  exit 1
+  widget_count=$(jq '.widgets | length' "$OUTPUT_FILE")
+  bad=0
+  for i in $(seq 0 $((widget_count - 1))); do
+    w=$(jq -c ".widgets[$i]" "$OUTPUT_FILE")
+    has_source=$(echo "$w" | jq 'has("source")')
+    has_content=$(echo "$w" | jq 'has("content")')
+    if [ "$has_source" = "true" ] && [ "$has_content" = "true" ]; then
+      error "Widget at index $i has both source and content"
+      bad=1
+    elif [ "$has_source" != "true" ] && [ "$has_content" != "true" ]; then
+      error "Widget at index $i has neither source nor content"
+      bad=1
+    fi
+    if [ "$has_source" = "true" ]; then
+      sp=$(echo "$w" | jq -r '.source.path')
+      if [ "$sp" != "null" ] && [ -n "$sp" ]; then
+        if [[ "$sp" == *".."* ]] || [[ "$sp" == /* ]]; then
+          error "Widget at index $i has invalid source.path: $sp"
+          bad=1
+        fi
+      fi
+    fi
+  done
+  if [ $bad -eq 1 ]; then
+    exit 1
+  fi
+  success "Valid JSON in $OUTPUT_FILE"
+  success "Found $widget_count widgets in registry"
+  exit 0
 fi
 
 if [ ! -d "$WIDGETS_DIR" ]; then
@@ -101,132 +124,224 @@ if [ ! -d "$WIDGETS_DIR" ]; then
   exit 1
 fi
 
-# Read global configuration from defaults
-CONTENT_FILE=$(jq -r '.contentFile' "$DEFAULTS_FILE")
-CONTENT_METHOD=$(jq -r '.contentMethod' "$DEFAULTS_FILE")
-REQUIRES_AUTH=$(jq -r '.requiresAuthentication' "$DEFAULTS_FILE")
-CACHE_STRATEGY=$(jq -r '.cacheStrategy' "$DEFAULTS_FILE")
+DEFAULT_BASE=$(jq -n -c \
+  --argjson containers "$DEFAULT_CONTAINERS" \
+  --argjson widgetsLibrary "$DEFAULT_WIDGETS_LIBRARY" \
+  --argjson settings "$DEFAULT_SETTINGS" \
+  '{containers: $containers, widgetsLibrary: $widgetsLibrary, settings: $settings}')
+success "Using built-in defaults"
 
-success "Loaded configuration from $DEFAULTS_FILE"
+normalize_widget_path() {
+  local raw="$1"
+  local name="$2"
+  if [[ "$raw" == *".."* ]] || [[ "$raw" == /* ]]; then
+    echo ""
+    return 1
+  fi
+  raw="${raw#/}"
+  raw="${raw%/}"
+  if [ -z "$raw" ] || [ "$raw" = "." ]; then
+    echo "${WIDGETS_DIR}/${name}"
+  else
+    echo "${WIDGETS_DIR}/${name}/${raw}"
+  fi
+}
 
-# Initialize widgets array
 WIDGETS_JSON="[]"
-
-# Process each widget directory
 widget_count=0
 error_count=0
 
 for widget_dir in "$WIDGETS_DIR"/*; do
-  if [ ! -d "$widget_dir" ]; then
-    continue
-  fi
-  
+  [ -d "$widget_dir" ] || continue
   widget_name=$(basename "$widget_dir")
   widget_config="$widget_dir/widget.json"
-  
+
   echo ""
   echo "Processing widget: $widget_name"
-  
-  # Check if widget.json exists
+
   if [ ! -f "$widget_config" ]; then
     error "  Missing widget.json in $widget_dir"
     ((error_count++))
     continue
   fi
-  
-  # Validate widget.json is valid JSON
+
   if ! jq empty "$widget_config" 2>/dev/null; then
     error "  Invalid JSON in $widget_config"
     ((error_count++))
     continue
   fi
-  
-  # Check required fields
+
   version=$(jq -r '.version // empty' "$widget_config")
   title=$(jq -r '.title // empty' "$widget_config")
   description=$(jq -r '.description // empty' "$widget_config")
-  
+
   if [ -z "$version" ]; then
     error "  Missing required field: version"
     ((error_count++))
     continue
   fi
-  
   if [ -z "$title" ]; then
     error "  Missing required field: title"
     ((error_count++))
     continue
   fi
-  
   if [ -z "$description" ]; then
     error "  Missing required field: description"
     ((error_count++))
     continue
   fi
-  
-  # Check for widget-specific contentFile override
-  widget_content_file=$(jq -r '.contentFile // empty' "$widget_config")
-  if [ -n "$widget_content_file" ]; then
-    content_file_name="$widget_content_file"
-  else
-    content_file_name="$CONTENT_FILE"
-  fi
 
-  content_file="$widget_dir/$content_file_name"
+  has_source=$(jq 'if .source != null then true else false end' "$widget_config")
+  has_content=$(jq 'if .content != null and (.content.endpoint | type == "string") and (.content.endpoint | startswith("http")) then true else false end' "$widget_config")
 
-  # Check if content file exists
-  if [ ! -f "$content_file" ]; then
-    error "  Missing $content_file_name in $widget_dir"
+  if [ "$has_source" = "true" ] && [ "$has_content" = "true" ]; then
+    error "  widget.json must not have both source and content"
     ((error_count++))
     continue
   fi
 
-  # Generate content endpoint URL with the correct content file
-  endpoint="./${WIDGETS_DIR}/${widget_name}/${content_file_name}"
-  
-  # Build the widget object by merging defaults + widget.json + auto-generated fields
-  # Filter out global config fields from defaults (keep only widget-specific defaults)
-  widget=$(jq -n \
-    --slurpfile defaults "$DEFAULTS_FILE" \
-    --slurpfile widget "$widget_config" \
-    --arg type "$widget_name" \
-    --arg endpoint "$endpoint" \
-    --arg method "$CONTENT_METHOD" \
-    --argjson requiresAuth "$REQUIRES_AUTH" \
-    --arg cacheStrategy "$CACHE_STRATEGY" \
-    '
-    # Merge all sources
-    ($defaults[0] | del(.visibility, .contentFile, .contentMethod, .requiresAuthentication, .cacheStrategy)) * $widget[0] * {
-      "type": $type,
-      "content": {
-        "endpoint": $endpoint,
-        "method": ($widget[0].contentMethod // $method),
-        "requiresAuthentication": ($widget[0].requiresAuthentication // $requiresAuth),
-        "cacheStrategy": ($widget[0].cacheStrategy // $cacheStrategy)
-      }
-    } |
-    # Remove widget-level content fields if they were used (they belong in content object only, or are used for URL generation)
-    del(.contentFile, .contentMethod, .requiresAuthentication, .cacheStrategy) |
-    # Reorder fields: priority fields first, then the rest
-    # configuration and defaultConfig are optional fields for dynamic widget customization
-    {
-      title,
-      description,
-      version,
-      category,
-      type,
-      imageName,
-      content,
-      configuration,
-      defaultConfig
-    } + . |
-    # Remove null values from optional fields that were not provided
-    del(.configuration | nulls) | del(.defaultConfig | nulls)
-    ')
-  
-  # Add to widgets array
+  if [ "$has_source" != "true" ] && [ "$has_content" != "true" ]; then
+    error "  widget.json must include either source or content"
+    ((error_count++))
+    continue
+  fi
+
+  image_src=$(jq -r '.imageSrc // empty' "$widget_config")
+  image_name=$(jq -r '.imageName // empty' "$widget_config")
+  [ "$image_src" = "null" ] && image_src=""
+  [ "$image_name" = "null" ] && image_name=""
+  if [ -n "$image_src" ] && [ -n "$image_name" ]; then
+    error "  Widget has both imageSrc and imageName; only one is allowed"
+    ((error_count++))
+    continue
+  fi
+
+  image_src_resolved=""
+  if [ -n "$image_src" ]; then
+    if [[ "$image_src" == http://* ]] || [[ "$image_src" == https://* ]]; then
+      image_src_resolved="$image_src"
+    else
+      if [[ "$image_src" == *".."* ]] || [[ "$image_src" == /* ]]; then
+        error "  Invalid imageSrc (no .. or leading /): $image_src"
+        ((error_count++))
+        continue
+      fi
+      image_src_normalized="${image_src#./}"
+      image_src_resolved="${WIDGETS_DIR}/${widget_name}/${image_src_normalized}"
+      if [ ! -f "$image_src_resolved" ]; then
+        error "  Thumbnail file not found: $image_src_resolved"
+        ((error_count++))
+        continue
+      fi
+      size_bytes=$(stat -f%z "$image_src_resolved" 2>/dev/null || stat -c%s "$image_src_resolved" 2>/dev/null)
+      if [ -n "$size_bytes" ] && [ "$size_bytes" -gt 524288 ]; then
+        error "  Thumbnail exceeds 512 KB: $image_src_resolved"
+        ((error_count++))
+        continue
+      fi
+    fi
+  fi
+
+  if [ "$has_source" = "true" ]; then
+    src_path=$(jq -r '.source.path // "."' "$widget_config")
+    src_entry=$(jq -r '.source.entry // empty' "$widget_config")
+    if [ -z "$src_entry" ] || [ "$src_entry" = "null" ]; then
+      error "  source.entry is required when source block is present"
+      ((error_count++))
+      continue
+    fi
+
+    repo_path=$(normalize_widget_path "$src_path" "$widget_name") || true
+    if [ -z "$repo_path" ]; then
+      error "  Invalid source.path (no .. or leading /): $src_path"
+      ((error_count++))
+      continue
+    fi
+
+    if [ "$src_path" = "." ] || [ -z "$src_path" ] || [ "$src_path" = "./" ]; then
+      check_dir="$widget_dir"
+      entry_file="$widget_dir/$src_entry"
+    else
+      check_dir="$widget_dir/$src_path"
+      entry_file="$widget_dir/$src_path/$src_entry"
+    fi
+
+    if [ ! -d "$check_dir" ]; then
+      error "  Source directory does not exist: $check_dir"
+      ((error_count++))
+      continue
+    fi
+    if [ ! -f "$entry_file" ]; then
+      error "  Entry file does not exist: $entry_file"
+      ((error_count++))
+      continue
+    fi
+
+    widget=$(jq -n \
+      --argjson default_base "$DEFAULT_BASE" \
+      --slurpfile widget "$widget_config" \
+      --arg type "$widget_name" \
+      --arg repo_path "$repo_path" \
+      --arg entry "$src_entry" \
+      --arg image_src_resolved "$image_src_resolved" \
+      '
+      def deep_merge(a; b):
+        if b == null then a
+        elif (a | type) != "object" or (b | type) != "object" then b
+        else (a | keys) + (b | keys) | unique
+        | map(. as $k | { ($k): (deep_merge(a[$k]; b[$k])) })
+        | add
+        end;
+      ($widget[0] | del(.source, .content, .imageSrc)) as $w
+      | deep_merge($default_base; $w)
+      | . + { "type": $type, "source": { "path": $repo_path, "entry": $entry } }
+      | if $image_src_resolved != "" then . + {"imageSrc": $image_src_resolved} | del(.imageName) else . end
+      | del(.configuration | nulls) | del(.defaultConfig | nulls)
+      ')
+  else
+    content_endpoint=$(jq -r '.content.endpoint' "$widget_config")
+    content_method=$(jq -r '.content.method // empty' "$widget_config")
+    [ -z "$content_method" ] || [ "$content_method" = "null" ] && content_method="$CONTENT_DEFAULT_METHOD"
+    content_auth=$(jq -c '.content.requiresAuthentication // empty' "$widget_config")
+    [ -z "$content_auth" ] || [ "$content_auth" = "null" ] && content_auth="$CONTENT_DEFAULT_REQUIRES_AUTH"
+    content_cache=$(jq -r '.content.cacheStrategy // empty' "$widget_config")
+    [ -z "$content_cache" ] || [ "$content_cache" = "null" ] && content_cache="$CONTENT_DEFAULT_CACHE_STRATEGY"
+
+    requires_auth_json="$content_auth"
+    widget=$(jq -n \
+      --argjson default_base "$DEFAULT_BASE" \
+      --slurpfile widget "$widget_config" \
+      --arg type "$widget_name" \
+      --arg endpoint "$content_endpoint" \
+      --arg method "$content_method" \
+      --arg requires_auth_str "$requires_auth_json" \
+      --arg cacheStrategy "$content_cache" \
+      --arg image_src_resolved "$image_src_resolved" \
+      '
+      def deep_merge(a; b):
+        if b == null then a
+        elif (a | type) != "object" or (b | type) != "object" then b
+        else (a | keys) + (b | keys) | unique
+        | map(. as $k | { ($k): (deep_merge(a[$k]; b[$k])) })
+        | add
+        end;
+      ($widget[0] | del(.source, .content, .imageSrc)) as $w
+      | deep_merge($default_base; $w)
+      | . + {
+          "type": $type,
+          "content": {
+            "endpoint": $endpoint,
+            "method": $method,
+            "requiresAuthentication": ($requires_auth_str | fromjson),
+            "cacheStrategy": $cacheStrategy
+          }
+        }
+      | if $image_src_resolved != "" then . + {"imageSrc": $image_src_resolved} | del(.imageName) else . end
+      | del(.configuration | nulls) | del(.defaultConfig | nulls)
+      ')
+  fi
+
   WIDGETS_JSON=$(echo "$WIDGETS_JSON" | jq --argjson widget "$widget" '. + [$widget]')
-  
   success "  Processed: $title (v$version)"
   ((widget_count++))
 done
@@ -246,10 +361,8 @@ fi
 
 success "Successfully processed $widget_count widget(s)"
 
-# Create final registry JSON
 REGISTRY_JSON=$(jq -n --argjson widgets "$WIDGETS_JSON" '{widgets: $widgets}')
 
-# Output result
 if [ "$DRY_RUN" = true ]; then
   echo ""
   warning "DRY RUN MODE - No files will be written"
@@ -262,4 +375,3 @@ fi
 
 echo ""
 success "Build complete!"
-
