@@ -21,8 +21,7 @@ This repository is a template for building and publishing widgets. Widgets are d
 
 ```
 .
-├── bin/build-registry.sh
-├── config/defaults.json
+├── bin/build-registry.sh   # Defaults at top of script; no external config file
 ├── widget_registry.json
 └── widgets/
     ├── WIDGET_SETUP.md
@@ -36,6 +35,7 @@ This repository is a template for building and publishing widgets. Widgets are d
 - Create one directory per widget under `widgets/`.
 - `widget.json` is required and must include:
   - `version` (semver), `title`, `description`
+  - either `source` (e.g. `"source": { "path": ".", "entry": "content.html" }` for repo-hosted) or `content` (for external URLs). Paths are relative to the widget directory; the build script merges defaults and resolves paths into the root registry.
 - The widget `type` is derived from the directory name; use lowercase and underscores.
 - `content.html` is required and must be a self-contained HTML fragment:
   - Do not include `<html>`, `<head>`, or `<body>`
@@ -48,9 +48,10 @@ This repository is a template for building and publishing widgets. Widgets are d
 
 ## Defaults and overrides
 
-- Global defaults live in `config/defaults.json`.
-- `widget.json` can override defaults and define:
-  - `category`, `imageName`, `configuration`, `defaultConfig`, and other widget settings.
+- All defaults (widget template and content-block) live at the top of `bin/build-registry.sh`; there is no external defaults file.
+- The build script deep-merges each `widget.json` over the default template, so widget config overrides at any depth (e.g. only `settings.movable`).
+- Each widget with a `source` block must set `source.entry` (e.g. `"content.html"`); there is no global default.
+- `widget.json` can define `category`, `imageName`, `configuration`, `defaultConfig`, and other widget settings.
 - When using `configuration`, template variables in `content.html` use `{{ variable_name }}`.
 
 ## Publishing notes
@@ -409,8 +410,7 @@ jq . widgets/<widget_name>/widget.json
 - Check JSON syntax is valid
 
 **"Content file not found"**
-- Verify `content.html` exists in widget directory
-- Check filename matches `contentFile` in defaults (default: "content.html")
+- Verify the entry file exists under the widget directory at the path given by `source.path` and `source.entry` (e.g. `content.html`)
 
 **Widget not appearing in registry**
 - Run `./bin/build-registry.sh --dry-run` to see errors

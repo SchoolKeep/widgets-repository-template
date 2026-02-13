@@ -29,9 +29,7 @@ The widget registry system uses individual configuration files for each widget, 
 ```
 widgets-repo-template/
 ├── bin/
-│   └── build-registry.sh    # Script to build widget_registry.json
-├── config/
-│   └── defaults.json        # Configuration and default values
+│   └── build-registry.sh    # Script to build widget_registry.json (defaults at top of file)
 ├── widget_registry.json     # Generated registry (DO NOT EDIT MANUALLY)
 └── widgets/
     ├── WIDGET_SETUP.md      # This documentation file
@@ -106,67 +104,46 @@ If you're using a build tool (like Vite, Webpack, etc.), ensure your build proce
 
 ## Configuration File
 
-### defaults.json
+### Defaults (in build script)
 
-This file contains both global configuration and default values for all widgets:
-
-```json
-{
-  "visibility": "private",
-  "contentFile": "content.html",
-  "contentMethod": "GET",
-  "requiresAuthentication": false,
-  "cacheStrategy": "no-cache",
-  "containers": ["Full width"],
-  "widgetsLibrary": true,
-  "settings": {
-    "configurable": true,
-    "editable": true,
-    "removable": true,
-    "shared": false,
-    "movable": false
-  }
-}
-```
-
-**Global Configuration Fields:**
-- `visibility` - Endpoint generation mode (must be `"private"`)
-  - Generates relative paths (e.g., `./widgets/demo_widget/content.html`)
-- `contentFile` - Name of the HTML content file (default: "content.html")
-- `contentMethod` - HTTP method for fetching content (default: "GET")
-- `requiresAuthentication` - Whether content requires auth (default: false)
-- `cacheStrategy` - Cache strategy for content (default: "no-cache")
-
-**Widget Default Fields:**
-- `containers` - Available container types
-- `widgetsLibrary` - Whether widget appears in library
-- `settings` - Default widget behavior settings
+All defaults live at the top of `bin/build-registry.sh`: a **widget template** (containers, widgetsLibrary, settings) and **content-block defaults** (method, requiresAuthentication, cacheStrategy) for widgets that use a `content` block. The build script deep-merges each widget's `widget.json` over this template, so you can override any default at any depth (e.g. only `settings.movable`). There is no external defaults file.
 
 ### widget.json
 
-Widget-specific configuration (only unique fields needed):
+Widget-specific configuration. Each `widget.json` must include either a **`source`** block (for repo-hosted content) or a **`content`** block (for external URLs). Paths in `source` and `imageSrc` are relative to the widget's directory; the build script resolves them to repository-root-relative paths in `widget_registry.json`.
 
+**Required fields:**
+- `version` - Semantic version (e.g., "1.0.0")
+- `title` - Display name of the widget
+- `description` - Brief description of the widget
+- `source` or `content` - Exactly one is required (see below)
+
+**Source block (repo-hosted):**
 ```json
 {
   "version": "1.0.0",
   "title": "My Widget",
   "description": "Description of what this widget does",
   "category": "Demo",
-  "imageName": "my_widget"
+  "imageName": "my_widget",
+  "source": {
+    "path": ".",
+    "entry": "content.html"
+  }
 }
 ```
+- `source.path` - Directory containing the entry file, relative to this widget's directory (use `"."` for the widget directory itself)
+- `source.entry` - **Required.** HTML entry file name, relative to `path` (e.g. `"content.html"`).
 
-**Required fields:**
-- `version` - Semantic version (e.g., "1.0.0")
-- `title` - Display name of the widget
-- `description` - Brief description of the widget
+**Content block (external):** Use `"content": { "endpoint": "https://...", "method": "GET", ... }` for widgets served from an external URL. The build script merges defaults for `method`, `requiresAuthentication`, and `cacheStrategy` when not set.
 
 **Optional fields:**
-- `category` - Widget category (default from config/defaults.json)
+- `category` - Widget category
 - `imageName` - Image identifier (defaults to directory name)
+- `imageSrc` - Thumbnail image: relative path (to widget dir) or absolute URL; relative paths are resolved to repo-root-relative in the registry
 - `configuration` - Schema for user-configurable properties (see [Dynamic Widget Configuration](#dynamic-widget-configuration))
 - `defaultConfig` - Default values for configurable properties
-- Any other field from config/defaults.json can be overridden
+- Any other widget template field (containers, widgetsLibrary, settings, etc.) can be overridden; widget.json is deep-merged over the script defaults
 
 ## Dynamic Widget Configuration
 
@@ -442,30 +419,27 @@ Display usage information.
 
 ## How It Works
 
-1. **Reads** global configuration from `config/defaults.json`
+1. **Uses** built-in defaults at the top of `bin/build-registry.sh` (widget template and content-block defaults)
 2. **Scans** the `widgets/` directory for subdirectories
 3. **Reads** each widget's `widget.json` configuration
-4. **Merges** widget-specific defaults and config:
-   - Widget-specific default values from `config/defaults.json` (excludes global config fields)
-   - Widget-specific values from `widget.json`
-   - Auto-generated values (type, endpoint URL)
-5. **Validates** required fields are present
+4. **Deep-merges** each widget over the default template, then sets `type`, resolved `source` or `content`, and `imageSrc`
+5. **Validates** required fields (including `source.entry` when a widget has a `source` block)
 6. **Generates** the final `widget_registry.json`
 
-### Auto-Generated Fields
+### Auto-Generated and Resolved Fields
 
 - `type`: Derived from the directory name (e.g., `my_widget`)
-- `content.endpoint`: Generated as a relative path
-  - Format: `./widgets/{type}/content.html`
-  - Uses relative paths for local widget content
+- `source.path` and `source.entry`: Resolved from widget.json (widget-dir-relative) to repository-root-relative. For example, `"path": "."` and `"entry": "content.html"` in `widgets/demo_widget/widget.json` become `"path": "widgets/demo_widget"`, `"entry": "content.html"` in the registry.
+- `imageSrc`: If a relative path is set in widget.json, it is resolved to a repo-root-relative path in the registry.
 
 ## Validation Rules
 
 The build script validates:
 
-- Required files exist (`widget.json`, `content.html`)
+- Required files exist (`widget.json`, and for `source` widgets the entry file under the given path)
 - JSON is valid
-- Required fields are present (`version`, `title`, `description`)
+- Required fields are present (`version`, `title`, `description`, and either `source` or `content`)
+- Paths in `source.path` and `imageSrc` do not contain `..` or start with `/`
 - Generated registry is valid JSON
 
 ## Troubleshooting
