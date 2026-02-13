@@ -5,7 +5,7 @@
   "category": "Demo",
   "imageName": "demo_widget",
   "source": {
-    "path": ".",
+    "path": "dist",
     "entry": "content.html"
   }
 }

@@ -117,7 +117,7 @@
       "widgetsLibrary": true,
       "type": "card_grid",
       "source": {
-        "path": "widgets/card_grid",
+        "path": "widgets/card_grid/dist",
         "entry": "content.html"
       }
     },
@@ -140,7 +140,7 @@
       "widgetsLibrary": true,
       "type": "demo_widget",
       "source": {
-        "path": "widgets/demo_widget",
+        "path": "widgets/demo_widget/dist",
         "entry": "content.html"
       }
     },
@@ -163,7 +163,7 @@
       "widgetsLibrary": true,
       "type": "react_hello_world",
       "source": {
-        "path": "widgets/react_hello_world",
+        "path": "widgets/react_hello_world/dist",
         "entry": "content.html"
       }
     }

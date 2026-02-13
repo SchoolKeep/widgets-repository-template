@@ -5,7 +5,7 @@
   "category": "Demo",
   "imageName": "react_hello_world",
   "source": {
-    "path": ".",
+    "path": "dist",
     "entry": "content.html"
   }
 }

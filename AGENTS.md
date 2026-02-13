@@ -3,7 +3,7 @@
 ## Project overview
 
 This repository is a template for building and publishing widgets. Widgets are defined in `widgets/<widget_name>/` with
-`widget.json` and `content.html`, and the registry is generated into `widget_registry.json`.
+`widget.json` and an entry file at `dist/content.html`. The service pulls only the directory at `source.path` (e.g. `dist/`). The registry is generated into `widget_registry.json`.
 
 ## Setup commands
 
@@ -27,7 +27,8 @@ This repository is a template for building and publishing widgets. Widgets are d
     ├── WIDGET_SETUP.md
     └── <widget_name>/
         ├── widget.json
-        └── content.html
+        └── dist/
+            └── content.html   # Entry file; source.path points at dist so only it is pulled
 ```
 
 ## Widget authoring rules
@@ -35,15 +36,15 @@ This repository is a template for building and publishing widgets. Widgets are d
 - Create one directory per widget under `widgets/`.
 - `widget.json` is required and must include:
   - `version` (semver), `title`, `description`
-  - either `source` (e.g. `"source": { "path": ".", "entry": "content.html" }` for repo-hosted) or `content` (for external URLs). Paths are relative to the widget directory; the build script merges defaults and resolves paths into the root registry.
+  - either `source` (e.g. `"source": { "path": "dist", "entry": "content.html" }` for repo-hosted) or `content` (for external URLs). Use `"path": "dist"` so the service pulls only the `dist/` directory. Paths are relative to the widget directory; the build script merges defaults and resolves paths into the root registry.
 - The widget `type` is derived from the directory name; use lowercase and underscores.
-- `content.html` is required and must be a self-contained HTML fragment:
+- The entry file (e.g. `dist/content.html`) is required and must be a self-contained HTML fragment:
   - Do not include `<html>`, `<head>`, or `<body>`
   - Inline all CSS and JavaScript
   - Do not use relative file references like `./styles.css` or `./script.js`
   - Absolute public URLs (CDNs, fonts) are allowed
 - If using a build tool (Vite/Webpack/etc.), the build output must be a single HTML fragment placed in
-  `content.html`.
+  `dist/content.html`.
 - Do not edit `widget_registry.json` manually; always run the build script.
 
 ## Defaults and overrides
@@ -65,7 +66,7 @@ This repository is a template for building and publishing widgets. Widgets are d
 When helping users create widgets:
 
 1. **Understand the widget type needed** (simple HTML, configurable, or React/modern framework)
-2. **Create widget structure** in `widgets/<widget_name>/` with `widget.json` and `content.html`
+2. **Create widget structure** in `widgets/<widget_name>/` with `widget.json` and `dist/content.html`
 3. **Follow the workflow** in section "AI Agent Guidelines for Widget Creation" below
 4. **Build and validate** using `./bin/build-registry.sh --dry-run` before final build
 
@@ -83,10 +84,11 @@ When helping users create widgets, follow these guidelines:
 
 **Step 2: Create Widget Structure**
 ```bash
-mkdir widgets/<widget_name>
+mkdir -p widgets/<widget_name>/dist
 touch widgets/<widget_name>/widget.json
-touch widgets/<widget_name>/content.html
+touch widgets/<widget_name>/dist/content.html
 ```
+Set `"source": { "path": "dist", "entry": "content.html" }` in widget.json so the service pulls only `dist/`.
 
 **Step 3: Write widget.json**
 - Always include required fields: `version`, `title`, `description`
@@ -96,7 +98,8 @@ touch widgets/<widget_name>/content.html
 - `configuration.properties` must be an **array** of property objects (not an object/map)
 - See examples in `widgets/demo_widget/`, `widgets/card_grid/`, `widgets/react_hello_world/`
 
-**Step 4: Write content.html**
+**Step 4: Write dist/content.html**
+- Put the entry file at `widgets/<widget_name>/dist/content.html`
 - Must be an HTML fragment (no `<html>`, `<head>`, `<body>` tags)
 - Inline all CSS in `<style>` tags
 - Inline all JavaScript in `<script>` tags
@@ -126,7 +129,7 @@ touch widgets/<widget_name>/content.html
 
 **React/Modern Framework Widget** (like `react_hello_world`)
 - Uses build tools (Vite, Webpack, etc.)
-- Build output must be a single HTML fragment in `content.html`
+- Build output must be a single HTML fragment in `dist/content.html`
 - Configure build to inline all CSS and JavaScript
 - See `widgets/react_hello_world/vite.config.ts` for Vite example
 
@@ -216,7 +219,7 @@ For React/Vue/other frameworks, ensure build outputs HTML fragment:
 **Vite Example** (see `widgets/react_hello_world/vite.config.ts`):
 - Use `vite-plugin-singlefile` to bundle everything
 - Create custom plugin to extract HTML fragment (remove `<html>`, `<head>`, `<body>`)
-- Output to `content.html` in widget directory
+- Output to `dist/content.html` in widget directory
 
 **Key Requirements:**
 - All CSS must be inlined or in `<style>` tags
@@ -295,7 +298,7 @@ For React/Vue/other frameworks, ensure build outputs HTML fragment:
 
 **Note:** `properties` is an array. Each property object includes `name`, `type`, `label`, `defaultValue`, and optionally `rules` and `options` (for `select` type).
 
-3. Create `content.html`:
+3. Create `dist/content.html`:
 ```html
 <style>
   .banner {
@@ -324,7 +327,7 @@ For React/Vue/other frameworks, ensure build outputs HTML fragment:
 **After building registry:**
 - Run `./bin/build-registry.sh --validate` to check registry
 - Verify widget appears in `widget_registry.json`
-- Check endpoint path is correct: `./widgets/<widget_name>/content.html`
+- Check endpoint path is correct: `./widgets/<widget_name>/dist/content.html`
 
 ### 9. Common Patterns
 
@@ -410,7 +413,7 @@ jq . widgets/<widget_name>/widget.json
 - Check JSON syntax is valid
 
 **"Content file not found"**
-- Verify the entry file exists under the widget directory at the path given by `source.path` and `source.entry` (e.g. `content.html`)
+- Verify the entry file exists at `source.path`/`source.entry` (e.g. `dist/content.html`)
 
 **Widget not appearing in registry**
 - Run `./bin/build-registry.sh --dry-run` to see errors

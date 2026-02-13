@@ -103,7 +103,7 @@
     "show_icons": "yes"
   },
   "source": {
-    "path": ".",
+    "path": "dist",
     "entry": "content.html"
   }
 }
