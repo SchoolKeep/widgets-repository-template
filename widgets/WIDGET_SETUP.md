@@ -110,7 +110,7 @@ All defaults live at the top of `bin/build-registry.sh`: a **widget template** (
 
 ### widget.json
 
-Widget-specific configuration. Each `widget.json` must include either a **`source`** block (for repo-hosted content) or a **`content`** block (for external URLs). Paths in `source` and `imageSrc` are relative to the widget's directory; the build script resolves them to repository-root-relative paths in `widget_registry.json`.
+Widget-specific configuration. Each `widget.json` must include either a **`source`** block (for repo-hosted content) or a **`content`** block (for external URLs). Paths in `source` and `imageSrc` are relative to the widget's directory; the build script resolves them to repository-root-relative paths in `widget_registry.json`. Use **only one** of `imageSrc` or `imageName` per widget; if both are set, the build fails.
 
 **Required fields:**
 - `version` - Semantic version (e.g., "1.0.0")
@@ -139,8 +139,7 @@ Widget-specific configuration. Each `widget.json` must include either a **`sourc
 
 **Optional fields:**
 - `category` - Widget category
-- `imageName` - Image identifier (defaults to directory name)
-- `imageSrc` - Thumbnail image: relative path (to widget dir) or absolute URL; relative paths are resolved to repo-root-relative in the registry
+- `imageName` or `imageSrc` - **Only one allowed.** `imageName` is a built-in thumbnail identifier (e.g. `banner`). `imageSrc` is a custom thumbnail: either an absolute URL or a path relative to the widget directory (e.g. `preview.png` or `./images/preview.png`). Relative paths are resolved to repo-root-relative in the registry; the build script validates that the file exists and is 512 KB or smaller.
 - `configuration` - Schema for user-configurable properties (see [Dynamic Widget Configuration](#dynamic-widget-configuration))
 - `defaultConfig` - Default values for configurable properties
 - Any other widget template field (containers, widgetsLibrary, settings, etc.) can be overridden; widget.json is deep-merged over the script defaults
@@ -422,15 +421,15 @@ Display usage information.
 1. **Uses** built-in defaults at the top of `bin/build-registry.sh` (widget template and content-block defaults)
 2. **Scans** the `widgets/` directory for subdirectories
 3. **Reads** each widget's `widget.json` configuration
-4. **Deep-merges** each widget over the default template, then sets `type`, resolved `source` or `content`, and `imageSrc`
-5. **Validates** required fields (including `source.entry` when a widget has a `source` block)
+4. **Deep-merges** each widget over the default template, then sets `type`, resolved `source` or `content`, and (when set) resolved `imageSrc`; the registry output has at most one of `imageSrc` or `imageName`
+5. **Validates** required fields (including `source.entry` when a widget has a `source` block), mutual exclusivity of `imageSrc` and `imageName`, and for relative `imageSrc` that the thumbnail file exists and is ≤512 KB
 6. **Generates** the final `widget_registry.json`
 
 ### Auto-Generated and Resolved Fields
 
 - `type`: Derived from the directory name (e.g., `my_widget`)
 - `source.path` and `source.entry`: Resolved from widget.json (widget-dir-relative) to repository-root-relative. For example, `"path": "."` and `"entry": "content.html"` in `widgets/demo_widget/widget.json` become `"path": "widgets/demo_widget"`, `"entry": "content.html"` in the registry.
-- `imageSrc`: If a relative path is set in widget.json, it is resolved to a repo-root-relative path in the registry.
+- `imageSrc`: If set in widget.json, either kept as-is (absolute URL) or resolved to a repo-root-relative path (relative to widget dir). The registry never has both `imageSrc` and `imageName`; when `imageSrc` is set, `imageName` is omitted.
 
 ## Validation Rules
 
@@ -439,7 +438,9 @@ The build script validates:
 - Required files exist (`widget.json`, and for `source` widgets the entry file under the given path)
 - JSON is valid
 - Required fields are present (`version`, `title`, `description`, and either `source` or `content`)
+- At most one of `imageSrc` or `imageName` is set in widget.json (build fails if both are set)
 - Paths in `source.path` and `imageSrc` do not contain `..` or start with `/`
+- For relative `imageSrc`, the thumbnail file exists and is 512 KB or smaller
 - Generated registry is valid JSON
 
 ## Troubleshooting

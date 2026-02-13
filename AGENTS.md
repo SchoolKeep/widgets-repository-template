@@ -51,7 +51,7 @@ This repository is a template for building and publishing widgets. Widgets are d
 - All defaults (widget template and content-block) live at the top of `bin/build-registry.sh`; there is no external defaults file.
 - The build script deep-merges each `widget.json` over the default template, so widget config overrides at any depth (e.g. only `settings.movable`).
 - Each widget with a `source` block must set `source.entry` (e.g. `"content.html"`); there is no global default.
-- `widget.json` can define `category`, `imageName`, `configuration`, `defaultConfig`, and other widget settings.
+- `widget.json` can define `category`, `configuration`, `defaultConfig`, and other widget settings. Use **only one** of `imageSrc` or `imageName` per widget (mutually exclusive). `imageName` is a built-in thumbnail; `imageSrc` is a custom thumbnail (absolute URL or path relative to the widget directory). The build script resolves relative `imageSrc` to repo-root-relative and validates that the file exists and is ≤512 KB.
 - When using `configuration`, template variables in `content.html` use `{{ variable_name }}`.
 
 ## Publishing notes

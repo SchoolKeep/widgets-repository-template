@@ -206,6 +206,42 @@ for widget_dir in "$WIDGETS_DIR"/*; do
     continue
   fi
 
+  image_src=$(jq -r '.imageSrc // empty' "$widget_config")
+  image_name=$(jq -r '.imageName // empty' "$widget_config")
+  [ "$image_src" = "null" ] && image_src=""
+  [ "$image_name" = "null" ] && image_name=""
+  if [ -n "$image_src" ] && [ -n "$image_name" ]; then
+    error "  Widget has both imageSrc and imageName; only one is allowed"
+    ((error_count++))
+    continue
+  fi
+
+  image_src_resolved=""
+  if [ -n "$image_src" ]; then
+    if [[ "$image_src" == http://* ]] || [[ "$image_src" == https://* ]]; then
+      image_src_resolved="$image_src"
+    else
+      if [[ "$image_src" == *".."* ]] || [[ "$image_src" == /* ]]; then
+        error "  Invalid imageSrc (no .. or leading /): $image_src"
+        ((error_count++))
+        continue
+      fi
+      image_src_normalized="${image_src#./}"
+      image_src_resolved="${WIDGETS_DIR}/${widget_name}/${image_src_normalized}"
+      if [ ! -f "$image_src_resolved" ]; then
+        error "  Thumbnail file not found: $image_src_resolved"
+        ((error_count++))
+        continue
+      fi
+      size_bytes=$(stat -f%z "$image_src_resolved" 2>/dev/null || stat -c%s "$image_src_resolved" 2>/dev/null)
+      if [ -n "$size_bytes" ] && [ "$size_bytes" -gt 524288 ]; then
+        error "  Thumbnail exceeds 512 KB: $image_src_resolved"
+        ((error_count++))
+        continue
+      fi
+    fi
+  fi
+
   if [ "$has_source" = "true" ]; then
     src_path=$(jq -r '.source.path // "."' "$widget_config")
     src_entry=$(jq -r '.source.entry // empty' "$widget_config")
@@ -241,22 +277,6 @@ for widget_dir in "$WIDGETS_DIR"/*; do
       continue
     fi
 
-    image_src=$(jq -r '.imageSrc // empty' "$widget_config")
-    if [ -n "$image_src" ] && [ "$image_src" != "null" ]; then
-      if [[ "$image_src" == http://* ]] || [[ "$image_src" == https://* ]]; then
-        image_src_resolved="$image_src"
-      else
-        if [[ "$image_src" == *".."* ]] || [[ "$image_src" == /* ]]; then
-          error "  Invalid imageSrc (no .. or leading /): $image_src"
-          ((error_count++))
-          continue
-        fi
-        image_src_resolved="${WIDGETS_DIR}/${widget_name}/${image_src}"
-      fi
-    else
-      image_src_resolved=""
-    fi
-
     widget=$(jq -n \
       --argjson default_base "$DEFAULT_BASE" \
       --slurpfile widget "$widget_config" \
@@ -275,7 +295,7 @@ for widget_dir in "$WIDGETS_DIR"/*; do
       ($widget[0] | del(.source, .content, .imageSrc)) as $w
       | deep_merge($default_base; $w)
       | . + { "type": $type, "source": { "path": $repo_path, "entry": $entry } }
-      | if $image_src_resolved != "" then . + {"imageSrc": $image_src_resolved} else . end
+      | if $image_src_resolved != "" then . + {"imageSrc": $image_src_resolved} | del(.imageName) else . end
       | del(.configuration | nulls) | del(.defaultConfig | nulls)
       ')
   else
@@ -286,22 +306,6 @@ for widget_dir in "$WIDGETS_DIR"/*; do
     [ -z "$content_auth" ] || [ "$content_auth" = "null" ] && content_auth="$CONTENT_DEFAULT_REQUIRES_AUTH"
     content_cache=$(jq -r '.content.cacheStrategy // empty' "$widget_config")
     [ -z "$content_cache" ] || [ "$content_cache" = "null" ] && content_cache="$CONTENT_DEFAULT_CACHE_STRATEGY"
-
-    image_src=$(jq -r '.imageSrc // empty' "$widget_config")
-    if [ -n "$image_src" ] && [ "$image_src" != "null" ]; then
-      if [[ "$image_src" == http://* ]] || [[ "$image_src" == https://* ]]; then
-        image_src_resolved="$image_src"
-      else
-        if [[ "$image_src" == *".."* ]] || [[ "$image_src" == /* ]]; then
-          error "  Invalid imageSrc (no .. or leading /): $image_src"
-          ((error_count++))
-          continue
-        fi
-        image_src_resolved="${WIDGETS_DIR}/${widget_name}/${image_src}"
-      fi
-    else
-      image_src_resolved=""
-    fi
 
     requires_auth_json="$content_auth"
     widget=$(jq -n \
@@ -332,7 +336,7 @@ for widget_dir in "$WIDGETS_DIR"/*; do
             "cacheStrategy": $cacheStrategy
           }
         }
-      | if $image_src_resolved != "" then . + {"imageSrc": $image_src_resolved} else . end
+      | if $image_src_resolved != "" then . + {"imageSrc": $image_src_resolved} | del(.imageName) else . end
       | del(.configuration | nulls) | del(.defaultConfig | nulls)
       ')
   fi
