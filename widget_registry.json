@@ -104,7 +104,6 @@
         "show_icons": "yes"
       },
       "description": "A configurable card grid widget demonstrating dynamic layout and styling options",
-      "imageName": "banner",
       "settings": {
         "configurable": true,
         "editable": true,
@@ -119,7 +118,8 @@
       "source": {
         "path": "widgets/card_grid/dist",
         "entry": "content.html"
-      }
+      },
+      "imageSrc": "widgets/card_grid/thumbnail.png"
     },
     {
       "category": "Demo",
@@ -127,7 +127,6 @@
         "Full width"
       ],
       "description": "Demo widget for presentation purposes",
-      "imageName": "demo_widget",
       "settings": {
         "configurable": true,
         "editable": true,
@@ -142,7 +141,8 @@
       "source": {
         "path": "widgets/demo_widget/dist",
         "entry": "content.html"
-      }
+      },
+      "imageSrc": "widgets/demo_widget/thumbnail.png"
     },
     {
       "category": "Demo",
@@ -150,7 +150,6 @@
         "Full width"
       ],
       "description": "A simple React widget displaying Hello World with custom styling",
-      "imageName": "react_hello_world",
       "settings": {
         "configurable": true,
         "editable": true,
@@ -165,7 +164,8 @@
       "source": {
         "path": "widgets/react_hello_world/dist",
         "entry": "content.html"
-      }
+      },
+      "imageSrc": "widgets/react_hello_world/thumbnail.png"
     }
   ]
 }

@@ -3,7 +3,7 @@
   "title": "Card Grid",
   "description": "A configurable card grid widget demonstrating dynamic layout and styling options",
   "category": "Demo",
-  "imageName": "banner",
+  "imageSrc": "thumbnail.png",
   "configuration": {
     "properties": [
       {
