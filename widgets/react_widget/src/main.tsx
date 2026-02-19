@@ -5,7 +5,7 @@ import type { WidgetSDK } from "./types";
 export async function init(sdk: WidgetSDK) {
   await sdk.whenReady();
 
-  const root = createRoot(sdk.shadowRoot as unknown as HTMLElement);
+  const root = createRoot(sdk.shadowRoot);
   root.render(<App sdk={sdk} />);
   sdk.on("destroy", () => root.unmount());
 }

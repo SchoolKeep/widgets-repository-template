@@ -8,7 +8,7 @@ const MOCK_PROPS: WidgetProps = {
 
 const mockSDK: WidgetSDK = {
   whenReady: () => Promise.resolve(),
-  shadowRoot: document.getElementById("widget-root")! as unknown as ShadowRoot,
+  shadowRoot: document.getElementById("widget-root")!,
   getProps: () => MOCK_PROPS,
   on: () => () => {},
   emit: () => {},
