@@ -1,6 +1,6 @@
 import type { Locale } from "./types";
 
-const T: Record<Locale, Record<string, string>> = {
+const TRANSLATIONS: Record<Locale, Record<string, string>> = {
   en: {
     title: "Welcome to Our Community",
     body: "We\u2019re glad you\u2019re here! This community is your space to ask questions, share ideas, and connect with other members. Here\u2019s how to get started:",
@@ -49,11 +49,11 @@ const T: Record<Locale, Record<string, string>> = {
 };
 
 export function getStrings(locale: Locale) {
-  return T[locale] ?? T.en;
+  return TRANSLATIONS[locale] ?? TRANSLATIONS.en;
 }
 
 export function resolveLocale(): Locale {
   const raw = document.documentElement.lang || new URLSearchParams(window.location.search).get("lang");
   const code = raw?.trim().toLowerCase().split(/[-_]/)[0] as Locale | undefined;
-  return code && code in T ? code : "en";
+  return code && code in TRANSLATIONS ? code : "en";
 }
