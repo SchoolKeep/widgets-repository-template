@@ -52,9 +52,7 @@
     white-space: nowrap;
   }
 
-  .lw-badge-hidden {
-    display: none;
-  }
+  .lw-badge-hidden { display: none; }
 
   .lw-body {
     font-size: 15px;
@@ -115,9 +113,7 @@
     transition: opacity .15s ease;
   }
 
-  .lw-cta:hover {
-    opacity: .88;
-  }
+  .lw-cta:hover { opacity: .88; }
 
   .lw-footer {
     margin-top: 20px;
@@ -126,9 +122,6 @@
     font-size: 12px;
     opacity: .5;
   }
-
-  .lw-lang { display: none; }
-  .lw-lang-{{ fallback_locale }} { display: contents; }
 
   @media (max-width: 480px) {
     .lw-root { padding: 16px; }
@@ -141,121 +134,119 @@
   <div class="lw-card">
     <div class="lw-header">
       <div class="lw-icon">🌐</div>
-      <h2 class="lw-title" data-i18n="title">
-        <span class="lw-lang lw-lang-en">Welcome to Our Community</span>
-        <span class="lw-lang lw-lang-es">Bienvenido a Nuestra Comunidad</span>
-        <span class="lw-lang lw-lang-fr">Bienvenue dans Notre Communauté</span>
-        <span class="lw-lang lw-lang-de">Willkommen in Unserer Community</span>
-        <span class="lw-lang lw-lang-pt">Bem-vindo à Nossa Comunidade</span>
-        <span class="lw-lang lw-lang-ja">コミュニティへようこそ</span>
-      </h2>
-      <span class="lw-badge" data-i18n-badge>{{ fallback_locale }}</span>
+      <h2 class="lw-title" data-i18n="title"></h2>
+      <span class="lw-badge" data-i18n="badge"></span>
     </div>
-    <p class="lw-body" data-i18n="body">
-      <span class="lw-lang lw-lang-en">We're glad you're here! This community is your space to ask questions, share ideas, and connect with other members. Here's how to get started:</span>
-      <span class="lw-lang lw-lang-es">¡Nos alegra que estés aquí! Esta comunidad es tu espacio para hacer preguntas, compartir ideas y conectar con otros miembros. Así es como puedes empezar:</span>
-      <span class="lw-lang lw-lang-fr">Nous sommes ravis de vous accueillir ! Cette communauté est votre espace pour poser des questions, partager des idées et échanger avec d'autres membres. Voici comment commencer :</span>
-      <span class="lw-lang lw-lang-de">Schön, dass Sie hier sind! Diese Community ist Ihr Raum, um Fragen zu stellen, Ideen zu teilen und sich mit anderen Mitgliedern zu vernetzen. So starten Sie:</span>
-      <span class="lw-lang lw-lang-pt">Estamos felizes por você estar aqui! Esta comunidade é o seu espaço para fazer perguntas, compartilhar ideias e se conectar com outros membros. Veja como começar:</span>
-      <span class="lw-lang lw-lang-ja">ご参加いただきありがとうございます！このコミュニティは、質問をしたり、アイデアを共有したり、他のメンバーとつながるための場所です。始め方をご案内します：</span>
-    </p>
+    <p class="lw-body" data-i18n="body"></p>
     <ol class="lw-steps">
       <li class="lw-step">
         <span class="lw-step-num">1</span>
-        <span class="lw-step-text" data-i18n="step1">
-          <span class="lw-lang lw-lang-en">Complete your profile so others can get to know you.</span>
-          <span class="lw-lang lw-lang-es">Completa tu perfil para que otros te conozcan.</span>
-          <span class="lw-lang lw-lang-fr">Complétez votre profil pour que les autres puissent faire votre connaissance.</span>
-          <span class="lw-lang lw-lang-de">Vervollständigen Sie Ihr Profil, damit andere Sie kennenlernen können.</span>
-          <span class="lw-lang lw-lang-pt">Complete seu perfil para que outros possam conhecê-lo.</span>
-          <span class="lw-lang lw-lang-ja">プロフィールを完成させて、他のメンバーに自己紹介しましょう。</span>
-        </span>
+        <span class="lw-step-text" data-i18n="step1"></span>
       </li>
       <li class="lw-step">
         <span class="lw-step-num">2</span>
-        <span class="lw-step-text" data-i18n="step2">
-          <span class="lw-lang lw-lang-en">Browse popular topics and join the conversations that interest you.</span>
-          <span class="lw-lang lw-lang-es">Explora los temas populares y únete a las conversaciones que te interesen.</span>
-          <span class="lw-lang lw-lang-fr">Parcourez les sujets populaires et rejoignez les conversations qui vous intéressent.</span>
-          <span class="lw-lang lw-lang-de">Entdecken Sie beliebte Themen und beteiligen Sie sich an Gesprächen, die Sie interessieren.</span>
-          <span class="lw-lang lw-lang-pt">Explore os tópicos populares e participe das conversas que te interessam.</span>
-          <span class="lw-lang lw-lang-ja">人気のトピックを閲覧し、興味のある会話に参加しましょう。</span>
-        </span>
+        <span class="lw-step-text" data-i18n="step2"></span>
       </li>
       <li class="lw-step">
         <span class="lw-step-num">3</span>
-        <span class="lw-step-text" data-i18n="step3">
-          <span class="lw-lang lw-lang-en">Post your first question or share an idea — the community is here to help.</span>
-          <span class="lw-lang lw-lang-es">Publica tu primera pregunta o comparte una idea — la comunidad está aquí para ayudarte.</span>
-          <span class="lw-lang lw-lang-fr">Publiez votre première question ou partagez une idée — la communauté est là pour vous aider.</span>
-          <span class="lw-lang lw-lang-de">Stellen Sie Ihre erste Frage oder teilen Sie eine Idee — die Community ist da, um zu helfen.</span>
-          <span class="lw-lang lw-lang-pt">Publique sua primeira pergunta ou compartilhe uma ideia — a comunidade está aqui para ajudar.</span>
-          <span class="lw-lang lw-lang-ja">最初の質問を投稿するか、アイデアを共有しましょう。コミュニティがお手伝いします。</span>
-        </span>
+        <span class="lw-step-text" data-i18n="step3"></span>
       </li>
     </ol>
-    <a href="#" class="lw-cta" data-i18n="cta">
-      <span class="lw-lang lw-lang-en">Explore Topics →</span>
-      <span class="lw-lang lw-lang-es">Explorar Temas →</span>
-      <span class="lw-lang lw-lang-fr">Explorer les Sujets →</span>
-      <span class="lw-lang lw-lang-de">Themen Entdecken →</span>
-      <span class="lw-lang lw-lang-pt">Explorar Tópicos →</span>
-      <span class="lw-lang lw-lang-ja">トピックを探す →</span>
-    </a>
-    <div class="lw-footer" data-i18n="footer">
-      <span class="lw-lang lw-lang-en">Content displayed in your detected language.</span>
-      <span class="lw-lang lw-lang-es">Contenido mostrado en tu idioma detectado.</span>
-      <span class="lw-lang lw-lang-fr">Contenu affiché dans votre langue détectée.</span>
-      <span class="lw-lang lw-lang-de">Inhalt wird in Ihrer erkannten Sprache angezeigt.</span>
-      <span class="lw-lang lw-lang-pt">Conteúdo exibido no seu idioma detectado.</span>
-      <span class="lw-lang lw-lang-ja">検出された言語でコンテンツを表示しています。</span>
-    </div>
+    <a href="#" class="lw-cta" data-i18n="cta"></a>
+    <div class="lw-footer" data-i18n="footer"></div>
   </div>
 </div>
 
 <script>
 (function () {
-  var SUPPORTED = ["en", "es", "fr", "de", "pt", "ja"];
+  var T = {
+    en: {
+      title: "Welcome to Our Community",
+      body: "We\u2019re glad you\u2019re here! This community is your space to ask questions, share ideas, and connect with other members. Here\u2019s how to get started:",
+      step1: "Complete your profile so others can get to know you.",
+      step2: "Browse popular topics and join the conversations that interest you.",
+      step3: "Post your first question or share an idea \u2014 the community is here to help.",
+      cta: "Explore Topics \u2192",
+      footer: "Content displayed in your detected language."
+    },
+    es: {
+      title: "Bienvenido a Nuestra Comunidad",
+      body: "\u00a1Nos alegra que est\u00e9s aqu\u00ed! Esta comunidad es tu espacio para hacer preguntas, compartir ideas y conectar con otros miembros. As\u00ed es como puedes empezar:",
+      step1: "Completa tu perfil para que otros te conozcan.",
+      step2: "Explora los temas populares y \u00fanete a las conversaciones que te interesen.",
+      step3: "Publica tu primera pregunta o comparte una idea \u2014 la comunidad est\u00e1 aqu\u00ed para ayudarte.",
+      cta: "Explorar Temas \u2192",
+      footer: "Contenido mostrado en tu idioma detectado."
+    },
+    fr: {
+      title: "Bienvenue dans Notre Communaut\u00e9",
+      body: "Nous sommes ravis de vous accueillir ! Cette communaut\u00e9 est votre espace pour poser des questions, partager des id\u00e9es et \u00e9changer avec d\u2019autres membres. Voici comment commencer :",
+      step1: "Compl\u00e9tez votre profil pour que les autres puissent faire votre connaissance.",
+      step2: "Parcourez les sujets populaires et rejoignez les conversations qui vous int\u00e9ressent.",
+      step3: "Publiez votre premi\u00e8re question ou partagez une id\u00e9e \u2014 la communaut\u00e9 est l\u00e0 pour vous aider.",
+      cta: "Explorer les Sujets \u2192",
+      footer: "Contenu affich\u00e9 dans votre langue d\u00e9tect\u00e9e."
+    },
+    de: {
+      title: "Willkommen in Unserer Community",
+      body: "Sch\u00f6n, dass Sie hier sind! Diese Community ist Ihr Raum, um Fragen zu stellen, Ideen zu teilen und sich mit anderen Mitgliedern zu vernetzen. So starten Sie:",
+      step1: "Vervollst\u00e4ndigen Sie Ihr Profil, damit andere Sie kennenlernen k\u00f6nnen.",
+      step2: "Entdecken Sie beliebte Themen und beteiligen Sie sich an Gespr\u00e4chen, die Sie interessieren.",
+      step3: "Stellen Sie Ihre erste Frage oder teilen Sie eine Idee \u2014 die Community ist da, um zu helfen.",
+      cta: "Themen Entdecken \u2192",
+      footer: "Inhalt wird in Ihrer erkannten Sprache angezeigt."
+    },
+    pt: {
+      title: "Bem-vindo \u00e0 Nossa Comunidade",
+      body: "Estamos felizes por voc\u00ea estar aqui! Esta comunidade \u00e9 o seu espa\u00e7o para fazer perguntas, compartilhar ideias e se conectar com outros membros. Veja como come\u00e7ar:",
+      step1: "Complete seu perfil para que outros possam conhec\u00ea-lo.",
+      step2: "Explore os t\u00f3picos populares e participe das conversas que te interessam.",
+      step3: "Publique sua primeira pergunta ou compartilhe uma ideia \u2014 a comunidade est\u00e1 aqui para ajudar.",
+      cta: "Explorar T\u00f3picos \u2192",
+      footer: "Conte\u00fado exibido no seu idioma detectado."
+    },
+    ja: {
+      title: "\u30b3\u30df\u30e5\u30cb\u30c6\u30a3\u3078\u3088\u3046\u3053\u305d",
+      body: "\u3054\u53c2\u52a0\u3044\u305f\u3060\u304d\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3059\uff01\u3053\u306e\u30b3\u30df\u30e5\u30cb\u30c6\u30a3\u306f\u3001\u8cea\u554f\u3092\u3057\u305f\u308a\u3001\u30a2\u30a4\u30c7\u30a2\u3092\u5171\u6709\u3057\u305f\u308a\u3001\u4ed6\u306e\u30e1\u30f3\u30d0\u30fc\u3068\u3064\u306a\u304c\u308b\u305f\u3081\u306e\u5834\u6240\u3067\u3059\u3002\u59cb\u3081\u65b9\u3092\u3054\u6848\u5185\u3057\u307e\u3059\uff1a",
+      step1: "\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3092\u5b8c\u6210\u3055\u305b\u3066\u3001\u4ed6\u306e\u30e1\u30f3\u30d0\u30fc\u306b\u81ea\u5df1\u7d39\u4ecb\u3057\u307e\u3057\u3087\u3046\u3002",
+      step2: "\u4eba\u6c17\u306e\u30c8\u30d4\u30c3\u30af\u3092\u95b2\u89a7\u3057\u3001\u8208\u5473\u306e\u3042\u308b\u4f1a\u8a71\u306b\u53c2\u52a0\u3057\u307e\u3057\u3087\u3046\u3002",
+      step3: "\u6700\u521d\u306e\u8cea\u554f\u3092\u6295\u7a3f\u3059\u308b\u304b\u3001\u30a2\u30a4\u30c7\u30a2\u3092\u5171\u6709\u3057\u307e\u3057\u3087\u3046\u3002\u30b3\u30df\u30e5\u30cb\u30c6\u30a3\u304c\u304a\u624b\u4f1d\u3044\u3057\u307e\u3059\u3002",
+      cta: "\u30c8\u30d4\u30c3\u30af\u3092\u63a2\u3059 \u2192",
+      footer: "\u691c\u51fa\u3055\u308c\u305f\u8a00\u8a9e\u3067\u30b3\u30f3\u30c6\u30f3\u30c4\u3092\u8868\u793a\u3057\u3066\u3044\u307e\u3059\u3002"
+    }
+  };
 
-  function normalizeLocale(raw) {
+  var SUPPORTED = Object.keys(T);
+
+  function normalize(raw) {
     if (!raw) return null;
     var code = raw.trim().toLowerCase().replace(/_/g, "-").split("-")[0];
     return SUPPORTED.indexOf(code) !== -1 ? code : null;
   }
 
-  function detectFromHtmlLang() {
-    var el = document.documentElement || document.querySelector("html");
-    return el ? normalizeLocale(el.getAttribute("lang")) : null;
-  }
+  function detect() {
+    var el = document.documentElement;
+    if (el && normalize(el.getAttribute("lang"))) return normalize(el.getAttribute("lang"));
 
-  function detectFromMeta() {
     var meta =
       document.querySelector('meta[http-equiv="content-language"]') ||
       document.querySelector('meta[name="language"]') ||
       document.querySelector('meta[property="og:locale"]');
-    return meta ? normalizeLocale(meta.getAttribute("content")) : null;
-  }
+    if (meta && normalize(meta.getAttribute("content"))) return normalize(meta.getAttribute("content"));
 
-  function detectFromUrl() {
-    var segments = window.location.pathname.split("/").filter(Boolean);
-    for (var i = 0; i < Math.min(segments.length, 2); i++) {
-      var match = normalizeLocale(segments[i]);
-      if (match) return match;
+    var segs = window.location.pathname.split("/").filter(Boolean);
+    for (var i = 0; i < Math.min(segs.length, 2); i++) {
+      if (normalize(segs[i])) return normalize(segs[i]);
     }
-    var params = new URLSearchParams(window.location.search);
-    return (
-      normalizeLocale(params.get("lang")) ||
-      normalizeLocale(params.get("locale")) ||
-      normalizeLocale(params.get("hl"))
-    );
-  }
+    var p = new URLSearchParams(window.location.search);
+    var qp = normalize(p.get("lang")) || normalize(p.get("locale")) || normalize(p.get("hl"));
+    if (qp) return qp;
 
-  function detectFromNavigator() {
     var langs = navigator.languages || [navigator.language || navigator.userLanguage];
-    for (var i = 0; i < langs.length; i++) {
-      var match = normalizeLocale(langs[i]);
-      if (match) return match;
+    for (var j = 0; j < langs.length; j++) {
+      if (normalize(langs[j])) return normalize(langs[j]);
     }
+
     return null;
   }
 
@@ -265,33 +256,20 @@
 
   if (!root) return;
 
-  var fallback = root.getAttribute("data-fallback") || "en";
+  var fallback = normalize(root.getAttribute("data-fallback")) || "en";
   var showBadge = root.getAttribute("data-show-badge") === "yes";
+  var locale = detect() || fallback;
+  var strings = T[locale] || T[fallback] || T.en;
 
-  var detected =
-    detectFromHtmlLang() ||
-    detectFromMeta() ||
-    detectFromUrl() ||
-    detectFromNavigator() ||
-    normalizeLocale(fallback) ||
-    "en";
-
-  if (detected === fallback) return;
-
-  var allLangs = root.querySelectorAll(".lw-lang");
-  for (var i = 0; i < allLangs.length; i++) {
-    allLangs[i].style.display = "none";
-  }
-
-  var activeLangs = root.querySelectorAll(".lw-lang-" + detected);
-  for (var j = 0; j < activeLangs.length; j++) {
-    activeLangs[j].style.display = "contents";
-  }
-
-  var badge = root.querySelector("[data-i18n-badge]");
-  if (badge) {
-    badge.textContent = detected.toUpperCase();
-    if (!showBadge) badge.classList.add("lw-badge-hidden");
+  var els = root.querySelectorAll("[data-i18n]");
+  for (var k = 0; k < els.length; k++) {
+    var key = els[k].getAttribute("data-i18n");
+    if (key === "badge") {
+      els[k].textContent = locale.toUpperCase();
+      if (!showBadge) els[k].classList.add("lw-badge-hidden");
+    } else if (strings[key]) {
+      els[k].textContent = strings[key];
+    }
   }
 })();
 </script>
