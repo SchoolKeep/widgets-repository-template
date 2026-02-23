@@ -127,6 +127,9 @@
     opacity: .5;
   }
 
+  .lw-lang { display: none; }
+  .lw-lang-{{ fallback_locale }} { display: contents; }
+
   @media (max-width: 480px) {
     .lw-root { padding: 16px; }
     .lw-card { padding: 20px; }
@@ -134,93 +137,85 @@
   }
 </style>
 
-<div class="lw-root">
+<div class="lw-root" data-fallback="{{ fallback_locale }}" data-show-badge="{{ show_locale_badge }}">
   <div class="lw-card">
     <div class="lw-header">
       <div class="lw-icon">🌐</div>
-      <h2 class="lw-title" data-i18n="title"></h2>
-      <span class="lw-badge" data-i18n-badge></span>
+      <h2 class="lw-title" data-i18n="title">
+        <span class="lw-lang lw-lang-en">Welcome to Our Community</span>
+        <span class="lw-lang lw-lang-es">Bienvenido a Nuestra Comunidad</span>
+        <span class="lw-lang lw-lang-fr">Bienvenue dans Notre Communauté</span>
+        <span class="lw-lang lw-lang-de">Willkommen in Unserer Community</span>
+        <span class="lw-lang lw-lang-pt">Bem-vindo à Nossa Comunidade</span>
+        <span class="lw-lang lw-lang-ja">コミュニティへようこそ</span>
+      </h2>
+      <span class="lw-badge" data-i18n-badge>{{ fallback_locale }}</span>
     </div>
-    <p class="lw-body" data-i18n="body"></p>
+    <p class="lw-body" data-i18n="body">
+      <span class="lw-lang lw-lang-en">We're glad you're here! This community is your space to ask questions, share ideas, and connect with other members. Here's how to get started:</span>
+      <span class="lw-lang lw-lang-es">¡Nos alegra que estés aquí! Esta comunidad es tu espacio para hacer preguntas, compartir ideas y conectar con otros miembros. Así es como puedes empezar:</span>
+      <span class="lw-lang lw-lang-fr">Nous sommes ravis de vous accueillir ! Cette communauté est votre espace pour poser des questions, partager des idées et échanger avec d'autres membres. Voici comment commencer :</span>
+      <span class="lw-lang lw-lang-de">Schön, dass Sie hier sind! Diese Community ist Ihr Raum, um Fragen zu stellen, Ideen zu teilen und sich mit anderen Mitgliedern zu vernetzen. So starten Sie:</span>
+      <span class="lw-lang lw-lang-pt">Estamos felizes por você estar aqui! Esta comunidade é o seu espaço para fazer perguntas, compartilhar ideias e se conectar com outros membros. Veja como começar:</span>
+      <span class="lw-lang lw-lang-ja">ご参加いただきありがとうございます！このコミュニティは、質問をしたり、アイデアを共有したり、他のメンバーとつながるための場所です。始め方をご案内します：</span>
+    </p>
     <ol class="lw-steps">
       <li class="lw-step">
         <span class="lw-step-num">1</span>
-        <span class="lw-step-text" data-i18n="step1"></span>
+        <span class="lw-step-text" data-i18n="step1">
+          <span class="lw-lang lw-lang-en">Complete your profile so others can get to know you.</span>
+          <span class="lw-lang lw-lang-es">Completa tu perfil para que otros te conozcan.</span>
+          <span class="lw-lang lw-lang-fr">Complétez votre profil pour que les autres puissent faire votre connaissance.</span>
+          <span class="lw-lang lw-lang-de">Vervollständigen Sie Ihr Profil, damit andere Sie kennenlernen können.</span>
+          <span class="lw-lang lw-lang-pt">Complete seu perfil para que outros possam conhecê-lo.</span>
+          <span class="lw-lang lw-lang-ja">プロフィールを完成させて、他のメンバーに自己紹介しましょう。</span>
+        </span>
       </li>
       <li class="lw-step">
         <span class="lw-step-num">2</span>
-        <span class="lw-step-text" data-i18n="step2"></span>
+        <span class="lw-step-text" data-i18n="step2">
+          <span class="lw-lang lw-lang-en">Browse popular topics and join the conversations that interest you.</span>
+          <span class="lw-lang lw-lang-es">Explora los temas populares y únete a las conversaciones que te interesen.</span>
+          <span class="lw-lang lw-lang-fr">Parcourez les sujets populaires et rejoignez les conversations qui vous intéressent.</span>
+          <span class="lw-lang lw-lang-de">Entdecken Sie beliebte Themen und beteiligen Sie sich an Gesprächen, die Sie interessieren.</span>
+          <span class="lw-lang lw-lang-pt">Explore os tópicos populares e participe das conversas que te interessam.</span>
+          <span class="lw-lang lw-lang-ja">人気のトピックを閲覧し、興味のある会話に参加しましょう。</span>
+        </span>
       </li>
       <li class="lw-step">
         <span class="lw-step-num">3</span>
-        <span class="lw-step-text" data-i18n="step3"></span>
+        <span class="lw-step-text" data-i18n="step3">
+          <span class="lw-lang lw-lang-en">Post your first question or share an idea — the community is here to help.</span>
+          <span class="lw-lang lw-lang-es">Publica tu primera pregunta o comparte una idea — la comunidad está aquí para ayudarte.</span>
+          <span class="lw-lang lw-lang-fr">Publiez votre première question ou partagez une idée — la communauté est là pour vous aider.</span>
+          <span class="lw-lang lw-lang-de">Stellen Sie Ihre erste Frage oder teilen Sie eine Idee — die Community ist da, um zu helfen.</span>
+          <span class="lw-lang lw-lang-pt">Publique sua primeira pergunta ou compartilhe uma ideia — a comunidade está aqui para ajudar.</span>
+          <span class="lw-lang lw-lang-ja">最初の質問を投稿するか、アイデアを共有しましょう。コミュニティがお手伝いします。</span>
+        </span>
       </li>
     </ol>
-    <a href="#" class="lw-cta" data-i18n="cta"></a>
-    <div class="lw-footer" data-i18n="footer"></div>
+    <a href="#" class="lw-cta" data-i18n="cta">
+      <span class="lw-lang lw-lang-en">Explore Topics →</span>
+      <span class="lw-lang lw-lang-es">Explorar Temas →</span>
+      <span class="lw-lang lw-lang-fr">Explorer les Sujets →</span>
+      <span class="lw-lang lw-lang-de">Themen Entdecken →</span>
+      <span class="lw-lang lw-lang-pt">Explorar Tópicos →</span>
+      <span class="lw-lang lw-lang-ja">トピックを探す →</span>
+    </a>
+    <div class="lw-footer" data-i18n="footer">
+      <span class="lw-lang lw-lang-en">Content displayed in your detected language.</span>
+      <span class="lw-lang lw-lang-es">Contenido mostrado en tu idioma detectado.</span>
+      <span class="lw-lang lw-lang-fr">Contenu affiché dans votre langue détectée.</span>
+      <span class="lw-lang lw-lang-de">Inhalt wird in Ihrer erkannten Sprache angezeigt.</span>
+      <span class="lw-lang lw-lang-pt">Conteúdo exibido no seu idioma detectado.</span>
+      <span class="lw-lang lw-lang-ja">検出された言語でコンテンツを表示しています。</span>
+    </div>
   </div>
 </div>
 
 <script>
 (function () {
-  var TRANSLATIONS = {
-    en: {
-      title: "Welcome to Our Community",
-      body: "We're glad you're here! This community is your space to ask questions, share ideas, and connect with other members. Here's how to get started:",
-      step1: "Complete your profile so others can get to know you.",
-      step2: "Browse popular topics and join the conversations that interest you.",
-      step3: "Post your first question or share an idea — the community is here to help.",
-      cta: "Explore Topics →",
-      footer: "Content displayed in your detected language."
-    },
-    es: {
-      title: "Bienvenido a Nuestra Comunidad",
-      body: "¡Nos alegra que estés aquí! Esta comunidad es tu espacio para hacer preguntas, compartir ideas y conectar con otros miembros. Así es como puedes empezar:",
-      step1: "Completa tu perfil para que otros te conozcan.",
-      step2: "Explora los temas populares y únete a las conversaciones que te interesen.",
-      step3: "Publica tu primera pregunta o comparte una idea — la comunidad está aquí para ayudarte.",
-      cta: "Explorar Temas →",
-      footer: "Contenido mostrado en tu idioma detectado."
-    },
-    fr: {
-      title: "Bienvenue dans Notre Communauté",
-      body: "Nous sommes ravis de vous accueillir ! Cette communauté est votre espace pour poser des questions, partager des idées et échanger avec d'autres membres. Voici comment commencer :",
-      step1: "Complétez votre profil pour que les autres puissent faire votre connaissance.",
-      step2: "Parcourez les sujets populaires et rejoignez les conversations qui vous intéressent.",
-      step3: "Publiez votre première question ou partagez une idée — la communauté est là pour vous aider.",
-      cta: "Explorer les Sujets →",
-      footer: "Contenu affiché dans votre langue détectée."
-    },
-    de: {
-      title: "Willkommen in Unserer Community",
-      body: "Schön, dass Sie hier sind! Diese Community ist Ihr Raum, um Fragen zu stellen, Ideen zu teilen und sich mit anderen Mitgliedern zu vernetzen. So starten Sie:",
-      step1: "Vervollständigen Sie Ihr Profil, damit andere Sie kennenlernen können.",
-      step2: "Entdecken Sie beliebte Themen und beteiligen Sie sich an Gesprächen, die Sie interessieren.",
-      step3: "Stellen Sie Ihre erste Frage oder teilen Sie eine Idee — die Community ist da, um zu helfen.",
-      cta: "Themen Entdecken →",
-      footer: "Inhalt wird in Ihrer erkannten Sprache angezeigt."
-    },
-    pt: {
-      title: "Bem-vindo à Nossa Comunidade",
-      body: "Estamos felizes por você estar aqui! Esta comunidade é o seu espaço para fazer perguntas, compartilhar ideias e se conectar com outros membros. Veja como começar:",
-      step1: "Complete seu perfil para que outros possam conhecê-lo.",
-      step2: "Explore os tópicos populares e participe das conversas que te interessam.",
-      step3: "Publique sua primeira pergunta ou compartilhe uma ideia — a comunidade está aqui para ajudar.",
-      cta: "Explorar Tópicos →",
-      footer: "Conteúdo exibido no seu idioma detectado."
-    },
-    ja: {
-      title: "コミュニティへようこそ",
-      body: "ご参加いただきありがとうございます！このコミュニティは、質問をしたり、アイデアを共有したり、他のメンバーとつながるための場所です。始め方をご案内します：",
-      step1: "プロフィールを完成させて、他のメンバーに自己紹介しましょう。",
-      step2: "人気のトピックを閲覧し、興味のある会話に参加しましょう。",
-      step3: "最初の質問を投稿するか、アイデアを共有しましょう。コミュニティがお手伝いします。",
-      cta: "トピックを探す →",
-      footer: "検出された言語でコンテンツを表示しています。"
-    }
-  };
-
-  var SUPPORTED = Object.keys(TRANSLATIONS);
+  var SUPPORTED = ["en", "es", "fr", "de", "pt", "ja"];
 
   function normalizeLocale(raw) {
     if (!raw) return null;
@@ -264,8 +259,14 @@
     return null;
   }
 
-  var fallback = "{{ fallback_locale }}";
-  var showBadge = "{{ show_locale_badge }}" === "yes";
+  var root = document.currentScript
+    ? document.currentScript.previousElementSibling
+    : document.querySelector(".lw-root");
+
+  if (!root) return;
+
+  var fallback = root.getAttribute("data-fallback") || "en";
+  var showBadge = root.getAttribute("data-show-badge") === "yes";
 
   var detected =
     detectFromHtmlLang() ||
@@ -275,18 +276,16 @@
     normalizeLocale(fallback) ||
     "en";
 
-  var strings = TRANSLATIONS[detected] || TRANSLATIONS["en"];
+  if (detected === fallback) return;
 
-  var root = document.currentScript
-    ? document.currentScript.parentElement
-    : document.querySelector(".lw-root");
+  var allLangs = root.querySelectorAll(".lw-lang");
+  for (var i = 0; i < allLangs.length; i++) {
+    allLangs[i].style.display = "none";
+  }
 
-  if (!root) return;
-
-  var els = root.querySelectorAll("[data-i18n]");
-  for (var i = 0; i < els.length; i++) {
-    var key = els[i].getAttribute("data-i18n");
-    if (strings[key]) els[i].textContent = strings[key];
+  var activeLangs = root.querySelectorAll(".lw-lang-" + detected);
+  for (var j = 0; j < activeLangs.length; j++) {
+    activeLangs[j].style.display = "contents";
   }
 
   var badge = root.querySelector("[data-i18n-badge]");
