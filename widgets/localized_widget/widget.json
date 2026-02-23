@@ -16,8 +16,7 @@
           { "value": "es", "label": "Español" },
           { "value": "fr", "label": "Français" },
           { "value": "de", "label": "Deutsch" },
-          { "value": "pt", "label": "Português" },
-          { "value": "ja", "label": "日本語" }
+          { "value": "pt", "label": "Português" }
         ]
       },
       {
