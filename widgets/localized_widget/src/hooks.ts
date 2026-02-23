@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
 import { SUPPORTED_LOCALES, TRANSLATIONS } from "./constants";
-import type { Locale, TranslationStrings, WidgetSDK, WidgetProps } from "./types";
+import type { Locale, TranslationStrings } from "./types";
 
 function normalize(raw: string | null | undefined): Locale | null {
   if (!raw) return null;
@@ -32,18 +31,12 @@ function detectFromPage(): Locale | null {
   );
 }
 
-export function useLocale(fallback: Locale): {
+export function useLocale(fallback: Locale = "en"): {
   locale: Locale;
   strings: TranslationStrings;
 } {
   const pageLocale = detectFromPage();
   const locale = pageLocale ?? fallback;
-  const strings = TRANSLATIONS[locale] ?? TRANSLATIONS[fallback] ?? TRANSLATIONS.en;
+  const strings = TRANSLATIONS[locale] ?? TRANSLATIONS.en;
   return { locale, strings };
-}
-
-export function useWidgetProps(sdk: WidgetSDK): WidgetProps {
-  const [props, setProps] = useState<WidgetProps>(sdk.getProps());
-  useEffect(() => sdk.on("propsChanged", setProps), [sdk]);
-  return props;
 }

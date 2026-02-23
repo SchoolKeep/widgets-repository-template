@@ -1,17 +1,8 @@
-export interface WidgetProps {
-  fallback_locale?: string;
-  accent_color?: string;
-  card_background?: string;
-  text_color?: string;
-  show_locale_badge?: string;
-  [key: string]: unknown;
-}
-
 export interface WidgetSDK {
   whenReady(): Promise<void>;
   shadowRoot: ShadowRoot;
-  getProps(): WidgetProps;
-  on(event: string, callback: (data: WidgetProps) => void): () => void;
+  getProps(): Record<string, unknown>;
+  on(event: string, callback: (data: Record<string, unknown>) => void): () => void;
   emit(event: string, data?: unknown): void;
 }
 

@@ -6,6 +6,6 @@ export async function init(sdk: WidgetSDK) {
   await sdk.whenReady();
 
   const root = createRoot(sdk.shadowRoot);
-  root.render(<App sdk={sdk} />);
+  root.render(<App />);
   sdk.on("destroy", () => root.unmount());
 }

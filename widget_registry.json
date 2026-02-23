@@ -2,82 +2,9 @@
   "widgets": [
     {
       "category": "Content",
-      "configuration": {
-        "properties": [
-          {
-            "name": "fallback_locale",
-            "type": "select",
-            "label": "Fallback Language",
-            "defaultValue": "en",
-            "options": [
-              {
-                "value": "en",
-                "label": "English"
-              },
-              {
-                "value": "es",
-                "label": "Español"
-              },
-              {
-                "value": "fr",
-                "label": "Français"
-              },
-              {
-                "value": "de",
-                "label": "Deutsch"
-              },
-              {
-                "value": "pt",
-                "label": "Português"
-              }
-            ]
-          },
-          {
-            "name": "accent_color",
-            "type": "color",
-            "label": "Accent Color",
-            "defaultValue": "#6366f1"
-          },
-          {
-            "name": "card_background",
-            "type": "color",
-            "label": "Card Background",
-            "defaultValue": "#ffffff"
-          },
-          {
-            "name": "text_color",
-            "type": "color",
-            "label": "Text Color",
-            "defaultValue": "#1e293b"
-          },
-          {
-            "name": "show_locale_badge",
-            "type": "select",
-            "label": "Show Detected Locale Badge",
-            "defaultValue": "yes",
-            "options": [
-              {
-                "value": "yes",
-                "label": "Yes"
-              },
-              {
-                "value": "no",
-                "label": "No"
-              }
-            ]
-          }
-        ]
-      },
       "containers": [
         "Full width"
       ],
-      "defaultConfig": {
-        "fallback_locale": "en",
-        "accent_color": "#6366f1",
-        "card_background": "#ffffff",
-        "text_color": "#1e293b",
-        "show_locale_badge": "yes"
-      },
       "description": "A multi-language widget with automatic locale discovery using the Widget SDK. Detects the user's language and renders localized content.",
       "settings": {
         "configurable": true,
