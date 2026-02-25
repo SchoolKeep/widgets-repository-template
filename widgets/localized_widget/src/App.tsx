@@ -1,12 +1,19 @@
 import "./widget.css";
 import { resolveLocale, getStrings } from "./translations";
 
-export function App() {
+interface AppProps {
+  accentColor: string;
+}
+
+export function App({ accentColor }: AppProps) {
   const locale = resolveLocale();
   const strings = getStrings(locale);
 
   return (
-    <div className="lw-root">
+    <div
+      className="lw-root"
+      style={{ "--lw-accent-color": accentColor } as React.CSSProperties}
+    >
       <div className="lw-card">
         <div className="lw-header">
           <div className="lw-icon">🌐</div>

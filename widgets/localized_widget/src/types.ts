@@ -1,5 +1,13 @@
+export interface WidgetProps {
+  accent_color: string;
+}
+
+export interface ReadySDK {
+  getProps(): WidgetProps;
+}
+
 export interface WidgetSDK {
-  whenReady(): Promise<void>;
+  whenReady(): Promise<ReadySDK>;
   shadowRoot: ShadowRoot;
   on(event: string, callback: () => void): () => void;
 }

@@ -1,6 +1,6 @@
-import { jsx as o, jsxs as s } from "react/jsx-runtime";
-import { createRoot as i } from "react-dom/client";
-const a = {
+import { jsx as t, jsxs as r } from "react/jsx-runtime";
+import { createRoot as c } from "react-dom/client";
+const n = {
   en: {
     title: "Welcome to Our Community",
     body: "We’re glad you’re here! This community is your space to ask questions, share ideas, and connect with other members. Here’s how to get started:",
@@ -47,35 +47,43 @@ const a = {
     footer: "Conteúdo exibido no seu idioma detectado."
   }
 };
-function c(t) {
-  return a[t] ?? a.en;
-}
-function l() {
-  const t = document.documentElement.lang || new URLSearchParams(window.location.search).get("lang"), e = t == null ? void 0 : t.trim().toLowerCase().split(/[-_]/)[0];
-  return e && e in a ? e : "en";
+function l(e) {
+  return n[e] ?? n.en;
 }
 function u() {
-  const t = l(), e = c(t);
-  return /* @__PURE__ */ o("div", { className: "lw-root", children: /* @__PURE__ */ s("div", { className: "lw-card", children: [
-    /* @__PURE__ */ s("div", { className: "lw-header", children: [
-      /* @__PURE__ */ o("div", { className: "lw-icon", children: "🌐" }),
-      /* @__PURE__ */ o("h2", { className: "lw-title", children: e.title }),
-      /* @__PURE__ */ o("span", { className: "lw-badge", children: t })
-    ] }),
-    /* @__PURE__ */ o("p", { className: "lw-body", children: e.body }),
-    /* @__PURE__ */ o("ol", { className: "lw-steps", children: [e.step1, e.step2, e.step3].map((r, n) => /* @__PURE__ */ s("li", { className: "lw-step", children: [
-      /* @__PURE__ */ o("span", { className: "lw-step-num", children: n + 1 }),
-      /* @__PURE__ */ o("span", { className: "lw-step-text", children: r })
-    ] }, n)) }),
-    /* @__PURE__ */ o("a", { href: "#", className: "lw-cta", children: e.cta }),
-    /* @__PURE__ */ o("div", { className: "lw-footer", children: e.footer })
-  ] }) });
+  const e = document.documentElement.lang || new URLSearchParams(window.location.search).get("lang"), s = e == null ? void 0 : e.trim().toLowerCase().split(/[-_]/)[0];
+  return s && s in n ? s : "en";
 }
-async function p(t) {
-  await t.whenReady();
-  const e = i(t.shadowRoot);
-  e.render(/* @__PURE__ */ o(u, {})), t.on("destroy", () => e.unmount());
+function d({ accentColor: e }) {
+  const s = u(), o = l(s);
+  return /* @__PURE__ */ t(
+    "div",
+    {
+      className: "lw-root",
+      style: { "--lw-accent-color": e },
+      children: /* @__PURE__ */ r("div", { className: "lw-card", children: [
+        /* @__PURE__ */ r("div", { className: "lw-header", children: [
+          /* @__PURE__ */ t("div", { className: "lw-icon", children: "🌐" }),
+          /* @__PURE__ */ t("h2", { className: "lw-title", children: o.title }),
+          /* @__PURE__ */ t("span", { className: "lw-badge", children: s })
+        ] }),
+        /* @__PURE__ */ t("p", { className: "lw-body", children: o.body }),
+        /* @__PURE__ */ t("ol", { className: "lw-steps", children: [o.step1, o.step2, o.step3].map((a, i) => /* @__PURE__ */ r("li", { className: "lw-step", children: [
+          /* @__PURE__ */ t("span", { className: "lw-step-num", children: i + 1 }),
+          /* @__PURE__ */ t("span", { className: "lw-step-text", children: a })
+        ] }, i)) }),
+        /* @__PURE__ */ t("a", { href: "#", className: "lw-cta", children: o.cta }),
+        /* @__PURE__ */ t("div", { className: "lw-footer", children: o.footer })
+      ] })
+    }
+  );
+}
+async function h(e) {
+  const o = (await e.whenReady()).getProps();
+  console.log(o);
+  const a = c(e.shadowRoot);
+  a.render(/* @__PURE__ */ t(d, { accentColor: o.accent_color })), e.on("destroy", () => a.unmount());
 }
 export {
-  p as init
+  h as init
 };
