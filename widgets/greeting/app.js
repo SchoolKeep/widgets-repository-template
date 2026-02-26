@@ -7,10 +7,12 @@ export async function init(sdk) {
     card.style.background = props.color;
     titleEl.textContent = props.title;
     messageEl.textContent = props.message;
-    console.log("elo", document.querySelector(".card"));
   };
   render(sdk.getProps());
-  // sdk.on('propsChanged', render)
+  sdk.on("propsChanged", (props) => {
+    console.log("[greeting] propsChanged fired", props);
+    render(props);
+  });
   sdk.on("destroy", () => {
     sdk.shadowRoot.querySelector(".card").innerHTML = "";
   });
