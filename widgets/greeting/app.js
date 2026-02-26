@@ -1,7 +1,16 @@
 export async function init(sdk) {
-  console.log('[greeting] init called', sdk);
-  console.log('[greeting] sdk keys', Object.keys(sdk));
-  console.log('[greeting] sdk prototype keys', Object.getOwnPropertyNames(Object.getPrototypeOf(sdk)));
   await sdk.whenReady();
-  console.log('[greeting] sdk ready');
+  const render = (props) => {
+    const card = sdk.shadowRoot.querySelector('.card');
+    const titleEl = sdk.shadowRoot.querySelector('#title');
+    const messageEl = sdk.shadowRoot.querySelector('#message');
+    card.style.background = props.color;
+    titleEl.textContent = props.title;
+    messageEl.textContent = props.message;
+  };
+  render(sdk.getProps());
+  sdk.on('propsChanged', render);
+  sdk.on('destroy', () => {
+    sdk.shadowRoot.querySelector('.card').innerHTML = '';
+  });
 }
