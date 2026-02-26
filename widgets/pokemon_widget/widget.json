@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "title": "Pokemon Widget",
+  "description": "Displays Pikachu data fetched via the Pokemon API connector",
+  "category": "Demo",
+  "source": {
+    "path": "dist",
+    "entry": "content.html"
+  }
+}
