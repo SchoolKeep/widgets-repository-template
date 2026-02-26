@@ -1,5 +1,6 @@
 export async function init(sdk) {
   await sdk.whenReady();
+  window.sdk = sdk;
   const render = (props) => {
     const card = sdk.shadowRoot.querySelector(".card");
     const titleEl = sdk.shadowRoot.querySelector("#title");
