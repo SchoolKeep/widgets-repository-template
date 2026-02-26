@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import type { WidgetSDK, WidgetProps } from "./types";
 
 export function App({ sdk }: { sdk: WidgetSDK }) {
-  const [props, setProps] = useState<WidgetProps>(sdk.getProps());
-
-  useEffect(() => sdk.on("propsChanged", setProps), [sdk]);
+  const [props] = useState<WidgetProps>(sdk.getProps());
 
   return (
     <section className="react-widget-section">

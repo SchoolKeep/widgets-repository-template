@@ -1,18 +1,18 @@
-import { jsxs as i, jsx as o } from "react/jsx-runtime";
-import { createRoot as n } from "react-dom/client";
-import { useState as c, useEffect as s } from "react";
-function a({ sdk: t }) {
-  const [e, r] = c(t.getProps());
-  return s(() => t.on("propsChanged", r), [t]), /* @__PURE__ */ i("section", { className: "react-widget-section", children: [
+import { jsxs as r, jsx as o } from "react/jsx-runtime";
+import { createRoot as i } from "react-dom/client";
+import { useState as n } from "react";
+function c({ sdk: t }) {
+  const [e] = n(t.getProps());
+  return /* @__PURE__ */ r("section", { className: "react-widget-section", children: [
     /* @__PURE__ */ o("h3", { className: "react-widget-title", children: e.title }),
     e.description && /* @__PURE__ */ o("p", { className: "react-widget-description", children: e.description })
   ] });
 }
-async function l(t) {
+async function d(t) {
   await t.whenReady();
-  const e = n(t.shadowRoot);
-  e.render(/* @__PURE__ */ o(a, { sdk: t })), t.on("destroy", () => e.unmount());
+  const e = i(t.shadowRoot);
+  e.render(/* @__PURE__ */ o(c, { sdk: t })), t.on("destroy", () => e.unmount());
 }
 export {
-  l as init
+  d as init
 };
