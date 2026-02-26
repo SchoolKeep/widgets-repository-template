@@ -146,6 +146,29 @@
     },
     {
       "category": "Demo",
+      "containers": [
+        "Full width"
+      ],
+      "description": "Displays Pikachu data fetched via the Pokemon API connector",
+      "settings": {
+        "configurable": true,
+        "editable": true,
+        "removable": true,
+        "shared": false,
+        "movable": false
+      },
+      "title": "Pokemon Widget",
+      "version": "1.0.0",
+      "widgetsLibrary": true,
+      "type": "pokemon_widget",
+      "source": {
+        "path": "widgets/pokemon_widget/dist",
+        "entry": "content.html"
+      },
+      "imageSrc": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/35.png"
+    },
+    {
+      "category": "Demo",
       "configuration": {
         "properties": [
           {
