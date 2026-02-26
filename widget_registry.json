@@ -1,178 +1,61 @@
 {
   "widgets": [
     {
-      "category": "Demo",
-      "configuration": {
-        "properties": [
-          {
-            "name": "cards_per_row",
-            "type": "number",
-            "label": "Cards Per Row",
-            "defaultValue": 3,
-            "rules": {
-              "required": true,
-              "minimum": 1,
-              "maximum": 6
-            }
-          },
-          {
-            "name": "card_background",
-            "type": "color",
-            "label": "Card Background",
-            "defaultValue": "#ffffff"
-          },
-          {
-            "name": "card_text_color",
-            "type": "color",
-            "label": "Text Color",
-            "defaultValue": "#1f2937"
-          },
-          {
-            "name": "accent_color",
-            "type": "color",
-            "label": "Accent Color",
-            "defaultValue": "#3b82f6"
-          },
-          {
-            "name": "title_size",
-            "type": "select",
-            "label": "Title Size",
-            "defaultValue": "medium",
-            "options": [
-              {
-                "value": "small",
-                "label": "Small"
-              },
-              {
-                "value": "medium",
-                "label": "Medium"
-              },
-              {
-                "value": "large",
-                "label": "Large"
-              }
-            ]
-          },
-          {
-            "name": "card_style",
-            "type": "select",
-            "label": "Card Style",
-            "defaultValue": "shadow",
-            "options": [
-              {
-                "value": "flat",
-                "label": "Flat"
-              },
-              {
-                "value": "shadow",
-                "label": "Shadow"
-              },
-              {
-                "value": "bordered",
-                "label": "Bordered"
-              }
-            ]
-          },
-          {
-            "name": "show_icons",
-            "type": "select",
-            "label": "Show Icons",
-            "defaultValue": "yes",
-            "options": [
-              {
-                "value": "yes",
-                "label": "Yes"
-              },
-              {
-                "value": "no",
-                "label": "No"
-              }
-            ]
-          }
-        ]
-      },
+      "category": "custom",
       "containers": [
         "Full width"
       ],
-      "defaultConfig": {
-        "cards_per_row": 3,
-        "card_background": "#ffffff",
-        "card_text_color": "#1f2937",
-        "accent_color": "#3b82f6",
-        "title_size": "medium",
-        "card_style": "shadow",
-        "show_icons": "yes"
-      },
-      "description": "A configurable card grid widget demonstrating dynamic layout and styling options",
+      "description": "A welcome banner for community pages",
       "settings": {
-        "configurable": true,
+        "configurable": false,
         "editable": true,
+        "movable": false,
         "removable": true,
-        "shared": false,
-        "movable": false
+        "shared": false
       },
-      "title": "Card Grid",
+      "title": "Announcement Banner",
       "version": "1.0.0",
       "widgetsLibrary": true,
-      "type": "card_grid",
+      "type": "announcement",
       "source": {
-        "path": "widgets/card_grid/dist",
-        "entry": "content.html"
-      },
-      "imageSrc": "widgets/card_grid/thumbnail.png"
+        "path": "widgets/announcement",
+        "entry": "index.html"
+      }
     },
     {
-      "category": "Demo",
-      "containers": [
-        "Full width"
-      ],
-      "description": "Demo widget for presentation purposes",
-      "settings": {
-        "configurable": true,
-        "editable": true,
-        "removable": true,
-        "shared": false,
-        "movable": false
-      },
-      "title": "Demo widget",
-      "version": "1.0.0",
-      "widgetsLibrary": true,
-      "type": "demo_widget",
-      "source": {
-        "path": "widgets/demo_widget/dist",
-        "entry": "content.html"
-      },
-      "imageSrc": "widgets/demo_widget/thumbnail.png"
-    },
-    {
-      "category": "Demo",
+      "category": "custom",
       "configuration": {
         "properties": [
           {
             "name": "title",
             "type": "text",
             "label": "Title",
-            "defaultValue": "React Widget",
             "rules": {
               "required": true
             }
           },
           {
-            "name": "description",
+            "name": "message",
             "type": "text",
-            "label": "Description",
-            "defaultValue": "A widget built with React and the Widget SDK."
+            "label": "Message"
+          },
+          {
+            "name": "color",
+            "type": "color",
+            "label": "Background Color"
           }
         ]
       },
       "containers": [
-        "Full width"
+        "Full width",
+        "Sidebar"
       ],
       "defaultConfig": {
-        "title": "React Widget",
-        "description": "A widget built with React and the Widget SDK."
+        "title": "Welcome!",
+        "message": "Explore topics, ask questions, and connect with others.",
+        "color": "#eef5fc"
       },
-      "description": "A React widget using the ESM module pattern with Widget SDK",
+      "description": "A configurable greeting card",
       "settings": {
         "configurable": true,
         "editable": true,
@@ -180,15 +63,14 @@
         "shared": false,
         "movable": false
       },
-      "title": "React Widget",
+      "title": "Greeting Card",
       "version": "1.0.0",
       "widgetsLibrary": true,
-      "type": "react_widget",
+      "type": "greeting",
       "source": {
-        "path": "widgets/react_widget/dist",
+        "path": "widgets/greeting",
         "entry": "index.html"
-      },
-      "imageSrc": "widgets/react_widget/thumbnail.png"
+      }
     }
   ]
 }
