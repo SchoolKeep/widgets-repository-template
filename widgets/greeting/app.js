@@ -9,5 +9,11 @@ export async function init(sdk) {
     titleEl.textContent = props.title;
     messageEl.textContent = props.message;
   };
+
   render(sdk.getProps());
+
+  sdk.on("propsChanged", () => {
+    console.log("propsChanged", sdk.getProps());
+    render(sdk.getProps());
+  });
 }
