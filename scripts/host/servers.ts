@@ -28,25 +28,9 @@ export default mergeConfig(base, {
         res.setHeader('Content-Type', 'application/javascript');
         res.end("export * from '/src/main.tsx';");
       });
-      server.middlewares.use('/index.html', (_req, res) => {
-        res.setHeader('Content-Type', 'text/html');
-        res.end(\`<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <script type="module" src="/@vite/client"></script>
-  <script type="module">
-    import { injectIntoGlobalHook } from "/@react-refresh";
-    injectIntoGlobalHook(window);
-    window.$RefreshReg$ = () => {};
-    window.$RefreshSig$ = () => (type) => type;
-  </script>
-  <link rel="stylesheet" href="/widget.css">
-</head>
-<body>
-  <script type="module" src="/widget.js"></script>
-</body>
-</html>\`);
+      server.middlewares.use((req, _res, next) => {
+        if (req.url === '/index.html') req.url = '/';
+        next();
       });
     },
   }],
