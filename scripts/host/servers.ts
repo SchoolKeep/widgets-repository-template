@@ -1,6 +1,5 @@
 import { join } from 'path';
 import { writeFileSync, unlinkSync } from 'fs';
-import { tmpdir } from 'os';
 import { execa } from 'execa';
 import type { WidgetEntry } from './types.js';
 import { logWidget } from './ui.js';
@@ -16,11 +15,11 @@ export const startWidgetServer = async (
   const widgetDir = join(ROOT, 'widgets', widget.type);
   const viteBin = join(widgetDir, 'node_modules', '.bin', 'vite');
 
-  const overridePath = join(tmpdir(), `vite-preview-${widget.type}.config.ts`);
+  const overridePath = join(widgetDir, '.vite-preview.config.ts');
   writeFileSync(overridePath, [
     `import { mergeConfig } from 'vite';`,
     `import base from ${JSON.stringify(join(widgetDir, 'vite.config.ts'))};`,
-    `export default mergeConfig(base, { server: { allowedHosts: 'all' } });`,
+    `export default mergeConfig(base, { server: { allowedHosts: true } });`,
   ].join('\n'));
 
   const proc = execa(viteBin, ['dev', '--port', String(port), '--config', overridePath], {
