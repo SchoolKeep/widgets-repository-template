@@ -16,11 +16,22 @@ export const startWidgetServer = async (
   const viteBin = join(widgetDir, 'node_modules', '.bin', 'vite');
 
   const overridePath = join(widgetDir, '.vite-preview.config.ts');
-  writeFileSync(overridePath, [
-    `import { mergeConfig } from 'vite';`,
-    `import base from ${JSON.stringify(join(widgetDir, 'vite.config.ts'))};`,
-    `export default mergeConfig(base, { server: { allowedHosts: true } });`,
-  ].join('\n'));
+  writeFileSync(overridePath, `
+import { mergeConfig } from 'vite';
+import base from ${JSON.stringify(join(widgetDir, 'vite.config.ts'))};
+export default mergeConfig(base, {
+  server: { allowedHosts: true },
+  plugins: [{
+    name: 'widget-js-dev',
+    configureServer(server) {
+      server.middlewares.use('/widget.js', (_req, res) => {
+        res.setHeader('Content-Type', 'application/javascript');
+        res.end("export * from '/src/main.tsx';");
+      });
+    },
+  }],
+});
+`);
 
   const proc = execa(viteBin, ['dev', '--port', String(port), '--config', overridePath], {
     cwd: widgetDir,
