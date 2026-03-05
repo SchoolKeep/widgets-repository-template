@@ -22,11 +22,31 @@ import base from ${JSON.stringify(join(widgetDir, 'vite.config.ts'))};
 export default mergeConfig(base, {
   server: { allowedHosts: true },
   plugins: [{
-    name: 'widget-js-dev',
+    name: 'widget-dev',
     configureServer(server) {
       server.middlewares.use('/widget.js', (_req, res) => {
         res.setHeader('Content-Type', 'application/javascript');
         res.end("export * from '/src/main.tsx';");
+      });
+      server.middlewares.use('/index.html', (_req, res) => {
+        res.setHeader('Content-Type', 'text/html');
+        res.end(\`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script type="module" src="/@vite/client"></script>
+  <script type="module">
+    import { injectIntoGlobalHook } from "/@react-refresh";
+    injectIntoGlobalHook(window);
+    window.$RefreshReg$ = () => {};
+    window.$RefreshSig$ = () => (type) => type;
+  </script>
+  <link rel="stylesheet" href="/widget.css">
+</head>
+<body>
+  <script type="module" src="/widget.js"></script>
+</body>
+</html>\`);
       });
     },
   }],
