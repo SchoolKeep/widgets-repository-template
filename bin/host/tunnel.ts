@@ -15,20 +15,27 @@ export async function startTunnel(): Promise<{
     all: true,
   });
 
+  const REGISTERED_REGEX = /Registered tunnel connection/;
+
   const url = await new Promise<string>((resolve, reject) => {
     const timeout = setTimeout(() => {
       subprocess.kill();
-      reject(new Error("Timeout waiting for tunnel URL"));
-    }, 15000);
+      reject(new Error("Timeout waiting for tunnel to connect"));
+    }, 30000);
+
+    let foundUrl: string | null = null;
 
     subprocess.all?.on("data", (chunk: Buffer | string) => {
       const text = stripAnsi(
         typeof chunk === "string" ? chunk : chunk.toString()
       );
-      const match = text.match(TUNNEL_URL_REGEX);
-      if (match) {
+      if (!foundUrl) {
+        const match = text.match(TUNNEL_URL_REGEX);
+        if (match) foundUrl = match[0];
+      }
+      if (foundUrl && REGISTERED_REGEX.test(text)) {
         clearTimeout(timeout);
-        resolve(match[0]);
+        resolve(foundUrl);
       }
     });
 
