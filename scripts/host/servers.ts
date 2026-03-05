@@ -7,6 +7,14 @@ import chalk from 'chalk';
 
 const ROOT = process.cwd();
 
+const killPort = async (port: number) => {
+  try {
+    const { stdout } = await execa('lsof', ['-ti', `:${port}`]);
+    const pids = stdout.trim().split('\n').filter(Boolean);
+    if (pids.length) await execa('kill', ['-9', ...pids]);
+  } catch {}
+};
+
 export const startWidgetServer = async (
   widget: WidgetEntry,
   port: number,
@@ -15,6 +23,7 @@ export const startWidgetServer = async (
   const widgetDir = join(ROOT, 'widgets', widget.type);
   const viteBin = join(widgetDir, 'node_modules', '.bin', 'vite');
 
+  await killPort(port);
   const overridePath = join(widgetDir, '.vite-preview.config.ts');
   writeFileSync(overridePath, `
 import { mergeConfig } from 'vite';
