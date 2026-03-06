@@ -43,4 +43,4 @@ yarn dev
 yarn build
 ```
 
-The build output lands in `dist/` — a JS bundle (`widget.js`), a CSS file (`widget.css`), and an `index.html` that references them. The import map is expected to already be present on the page.
+The build output lands in `dist/` — intermediate assets (`widget.js`, `widget.css`) plus a final self-contained `content.html` entry with the CSS and JS inlined. The import map is expected to already be present on the page.

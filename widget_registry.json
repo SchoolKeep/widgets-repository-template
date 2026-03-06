@@ -186,7 +186,7 @@
       "type": "react_widget",
       "source": {
         "path": "widgets/react_widget/dist",
-        "entry": "index.html"
+        "entry": "content.html"
       },
       "imageSrc": "widgets/react_widget/thumbnail.png"
     }

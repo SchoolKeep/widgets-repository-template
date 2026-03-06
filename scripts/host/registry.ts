@@ -18,6 +18,20 @@ const readConnectorsRegistry = (): { connectors: unknown[] } | null => {
 export const isDevWidget = (widget: WidgetEntry): boolean =>
   existsSync(join(ROOT, 'widgets', widget.type, 'package.json'));
 
+const readPreviewHtml = (widget: WidgetEntry): string => {
+  const devEntryPath = join(ROOT, 'widgets', widget.type, 'content.html');
+  if (isDevWidget(widget) && existsSync(devEntryPath)) {
+    return readFileSync(devEntryPath, 'utf-8');
+  }
+
+  return readFileSync(join(ROOT, widget.source.path, widget.source.entry), 'utf-8');
+};
+
+const absolutizeAssetUrls = (html: string, tunnelUrl: string): string =>
+  html
+    .replace(/(href|src)="\.\/([^"]+)"/g, `$1="${tunnelUrl}/$2"`)
+    .replace(/(href|src)="\/([^"]+)"/g, `$1="${tunnelUrl}/$2"`);
+
 export const buildPreviewRegistry = (
   tunnelMap: Map<string, string>,
   allWidgets: WidgetEntry[],
@@ -25,8 +39,8 @@ export const buildPreviewRegistry = (
   const widgets = [...tunnelMap.entries()].map(([type, tunnelUrl]) => {
     const widget = allWidgets.find((w) => w.type === type)!;
     const { source, ...rest } = widget;
-    const rawHtml = readFileSync(join(ROOT, source.path, source.entry), 'utf-8');
-    const html = rawHtml.replace(/(href|src)="\.\/([^"]+)"/g, `$1="${tunnelUrl}/$2"`);
+    const rawHtml = readPreviewHtml(widget);
+    const html = absolutizeAssetUrls(rawHtml, tunnelUrl);
     return {
       ...rest,
       content: {
