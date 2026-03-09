@@ -1,7 +1,7 @@
 {
   "widgets": [
     {
-      "category": "Demo",
+      "category": "Local Preview",
       "configuration": {
         "properties": [
           {
@@ -36,7 +36,7 @@
         "shared": false,
         "movable": false
       },
-      "title": "React Widget",
+      "title": "React Widget (Local Preview)",
       "version": "1.0.0",
       "widgetsLibrary": true,
       "type": "react_widget",
