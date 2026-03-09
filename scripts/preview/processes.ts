@@ -15,6 +15,7 @@ export const startDevServer = (
     cwd: widgetDir,
     shell: true,
     stdio: ['ignore', 'pipe', 'pipe'],
+    // TODO: remove VITE_TUNNEL_URL once widget-service rewrites asset paths using content.endpoint origin instead of the CC domain
     env: { ...process.env, VITE_TUNNEL_URL: tunnelUrl },
   })
   const handleData = (data: Buffer) =>

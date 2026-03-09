@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
+      // TODO: remove this plugin and VITE_TUNNEL_URL once widget-service rewrites asset paths using content.endpoint origin instead of the CC domain
       {
         name: "absolute-tunnel-urls",
         transformIndexHtml: (html) =>
