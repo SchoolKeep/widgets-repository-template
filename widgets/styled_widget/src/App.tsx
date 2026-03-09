@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { StyleSheetManager } from "styled-components";
 import type { WidgetSDK, WidgetProps } from "./types";
 
 const Card = styled.div`
   padding: 2rem;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   border-radius: 12px;
   background: #1a1a2e;
   color: #e0e0e0;
@@ -40,14 +44,19 @@ export function App({ sdk }: { sdk: WidgetSDK }) {
   const [props, setProps] = useState<WidgetProps>(sdk.getProps());
   const [count, setCount] = useState(0);
 
-  useEffect(() => sdk.on("propsChanged", (data) => setProps(data as WidgetProps)), [sdk]);
+  useEffect(
+    () => sdk.on("propsChanged", (data) => setProps(data as WidgetProps)),
+    [sdk],
+  );
 
   return (
-    <Card>
-      <Label>{props.label ?? "Styled Widget"}</Label>
-      <Counter onClick={() => setCount((n) => n + 1)}>
-        Clicked {count} {count === 1 ? "time" : "times"}
-      </Counter>
-    </Card>
+    <StyleSheetManager target={sdk.shadowRoot as unknown as HTMLElement}>
+      <Card>
+        <Label>{props.label ?? "Styled Widget"}</Label>
+        <Counter onClick={() => setCount((n) => n + 1)}>
+          Clicked {count} {count === 1 ? "time" : "times"}
+        </Counter>
+      </Card>
+    </StyleSheetManager>
   );
 }
