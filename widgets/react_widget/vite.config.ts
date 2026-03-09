@@ -13,6 +13,10 @@ export default defineConfig(({ mode }) => {
           VITE_TUNNEL_URL
             ? html.replace(/src="\/(.*?)"/g, `src="${VITE_TUNNEL_URL}/$1"`)
             : html,
+        transform: (code) =>
+          VITE_TUNNEL_URL
+            ? code.replace(/"(\/@[^"]+)"/g, `"${VITE_TUNNEL_URL}$1"`)
+            : undefined,
       },
     ],
     server: {
