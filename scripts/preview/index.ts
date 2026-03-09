@@ -211,6 +211,7 @@ const main = async (): Promise<void> => {
     s.devProcess.process.on('exit', (code) => {
       const isSignalExit = code === 130 || code === 2
       if (code !== 0 && code !== null && !isSignalExit) {
+        if (process.stdin.isTTY) process.stdin.setRawMode(false)
         cleanup(state)
         process.exit(1)
       }
@@ -218,6 +219,18 @@ const main = async (): Promise<void> => {
   }
 
   showSessionStatus(sessions)
+
+  process.stdin.resume()
+  if (process.stdin.isTTY) {
+    process.stdin.setRawMode(true)
+    process.stdin.on('data', (key: Buffer) => {
+      if (key[0] === 0x03) {
+        process.stdin.setRawMode(false)
+        cleanup(state)
+        process.exit(0)
+      }
+    })
+  }
 }
 
 main().catch((e: unknown) => {
