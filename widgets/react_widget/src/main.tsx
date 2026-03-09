@@ -8,9 +8,7 @@ const MOCK_PROPS: WidgetProps = {
 };
 
 export function init(sdk: WidgetSDK) {
-  const container =
-    (sdk.shadowRoot.querySelector("#widget-root") as Element | null) ??
-    (sdk.shadowRoot as unknown as Element);
+  const container = sdk.shadowRoot.querySelector("#widget-root") ?? sdk.shadowRoot;
 
   sdk.whenReady().then(() => {
     const root = createRoot(container);
