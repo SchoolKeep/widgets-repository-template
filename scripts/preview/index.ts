@@ -52,27 +52,26 @@ const getWidgetPort = (widgetType: string): number => {
   }
 }
 
+const stripAnsi = (s: string) => s.replace(/\x1b\[[0-9;]*m/g, '')
+
 const showSessionStatus = (sessions: WidgetSession[]): void => {
-  const W = 62
-  const border = chalk.bold.cyan
-  const row = (text: string) => {
-    const padded = `  ${text}`.padEnd(W)
-    console.log(`  ${border('│')}${padded}${border('│')}`)
+  const W = 68
+  const b = chalk.bold.cyan
+  const row = (text = '') => {
+    const pad = ' '.repeat(Math.max(0, W - 2 - stripAnsi(text).length))
+    console.log(`  ${b('│')}  ${text}${pad}${b('│')}`)
   }
-  const empty = () => console.log(`  ${border('│')}${' '.repeat(W)}${border('│')}`)
   console.log()
-  console.log(`  ${border('╭' + '─'.repeat(W) + '╮')}`)
-  empty()
+  console.log(`  ${b('╭' + '─'.repeat(W) + '╮')}`)
+  row()
   row(chalk.bold('Preview Session'))
-  empty()
-  for (const s of sessions) {
-    row(`${s.widget.type.padEnd(16)} ${chalk.cyan(s.tunnelUrl ?? '')}  (${s.port})`)
-  }
-  empty()
+  row()
+  for (const s of sessions) row(`${s.widget.type.padEnd(16)}  ${chalk.cyan(s.tunnelUrl ?? '')}`)
+  row()
   row('Open CC and refresh. Dev server logs below.')
   row('Press Ctrl+C to end session and restore registry.')
-  empty()
-  console.log(`  ${border('╰' + '─'.repeat(W) + '╯')}`)
+  row()
+  console.log(`  ${b('╰' + '─'.repeat(W) + '╯')}`)
   console.log()
 }
 
@@ -109,7 +108,12 @@ const cleanup = (state: SessionState): void => {
 }
 
 const main = async (): Promise<void> => {
-  ui.showBanner()
+  console.log()
+  console.log(chalk.bold.cyan('  ╭──────────────────────────────────────────╮'))
+  console.log(chalk.bold.cyan('  │') + chalk.bold('  Widget Dev Preview                      ') + chalk.bold.cyan('│'))
+  console.log(chalk.bold.cyan('  │') + chalk.dim('  Local preview on CC                     ') + chalk.bold.cyan('│'))
+  console.log(chalk.bold.cyan('  ╰──────────────────────────────────────────╯'))
+  console.log()
 
   let widgets: WidgetDefinition[]
   try {
@@ -174,9 +178,10 @@ const main = async (): Promise<void> => {
     for (const s of sessions) {
       s.tunnelUrl = state.ngrokTunnels.urls.get(s.port) ?? null
     }
-    ngrokSpinner.succeed(
-      sessions.map(s => `${chalk.bold(s.widget.type)}: ${chalk.cyan(s.tunnelUrl ?? '')}`).join('  ')
-    )
+    ngrokSpinner.succeed('Tunnels ready')
+    for (const s of sessions) {
+      ui.info(`${chalk.bold(s.widget.type.padEnd(16))}  ${chalk.cyan(s.tunnelUrl ?? '')}`)
+    }
   } catch (e: unknown) {
     ngrokSpinner.fail(`Failed to start ngrok: ${e instanceof Error ? e.message : String(e)}`)
     process.exit(1)
