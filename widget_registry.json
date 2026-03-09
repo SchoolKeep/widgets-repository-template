@@ -47,6 +47,44 @@
         "cacheStrategy": "none"
       },
       "imageSrc": "widgets/react_widget/thumbnail.png"
+    },
+    {
+      "category": "Local Preview",
+      "configuration": {
+        "properties": [
+          {
+            "name": "label",
+            "type": "text",
+            "label": "Label",
+            "defaultValue": "Styled Widget"
+          }
+        ]
+      },
+      "containers": [
+        "Full width"
+      ],
+      "defaultConfig": {
+        "label": "Styled Widget"
+      },
+      "description": "A React widget using styled-components",
+      "settings": {
+        "configurable": true,
+        "editable": true,
+        "removable": true,
+        "shared": false,
+        "movable": false
+      },
+      "title": "Styled Widget (Local Preview)",
+      "version": "1.0.0",
+      "widgetsLibrary": true,
+      "type": "styled_widget",
+      "content": {
+        "endpoint": "http://localhost:5174",
+        "method": "GET",
+        "requiresAuthentication": false,
+        "cacheStrategy": "none"
+      },
+      "imageSrc": "widgets/react_widget/thumbnail.png"
     }
   ]
 }
