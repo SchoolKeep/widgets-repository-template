@@ -7,20 +7,25 @@ const MOCK_PROPS: WidgetProps = {
   description: "A widget built with React and the Widget SDK.",
 };
 
-const mockSDK: WidgetSDK = {
-  whenReady: () => Promise.resolve(),
-  shadowRoot: document.getElementById("widget-root") as unknown as ShadowRoot,
-  getProps: () => MOCK_PROPS,
-  on: () => () => {},
-  emit: () => {},
-};
+export function init(sdk: WidgetSDK) {
+  const container =
+    (sdk.shadowRoot.querySelector("#widget-root") as Element | null) ??
+    (sdk.shadowRoot as unknown as Element);
 
-const sdk: WidgetSDK =
-  (window as unknown as { WidgetServiceSDK?: WidgetSDK }).WidgetServiceSDK ??
-  mockSDK;
+  sdk.whenReady().then(() => {
+    const root = createRoot(container);
+    root.render(<App sdk={sdk} />);
+    sdk.on("destroy", () => root.unmount());
+  });
+}
 
-sdk.whenReady().then(() => {
-  const root = createRoot(sdk.shadowRoot as unknown as Element);
-  root.render(<App sdk={sdk} />);
-  sdk.on("destroy", () => root.unmount());
-});
+const devContainer = document.getElementById("widget-root");
+if (devContainer) {
+  init({
+    whenReady: () => Promise.resolve(),
+    shadowRoot: devContainer as unknown as ShadowRoot,
+    getProps: () => MOCK_PROPS,
+    on: () => () => {},
+    emit: () => {},
+  });
+}
