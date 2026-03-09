@@ -16,8 +16,6 @@ export const checkDirtyState = (): boolean => {
     .some(l => !l.endsWith('widget_registry.json'))
 }
 
-export const getCurrentBranch = (): string => run(['rev-parse', '--abbrev-ref', 'HEAD'])
-
 export const commitAndPush = (message: string): void => {
   run(['add', 'widget_registry.json'])
   run(['commit', '-m', message])
