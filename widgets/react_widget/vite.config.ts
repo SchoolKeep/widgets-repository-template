@@ -9,20 +9,25 @@ export default defineConfig(({ mode }) => {
       react(),
       {
         name: "absolute-tunnel-urls",
-        transformIndexHtml: (html) =>
-          VITE_TUNNEL_URL
-            ? html.replace(/src="\/(.*?)"/g, `src="${VITE_TUNNEL_URL}/$1"`)
-            : html,
-        transform: (code) =>
-          VITE_TUNNEL_URL
-            ? code.replace(/"(\/@[^"]+)"/g, `"${VITE_TUNNEL_URL}$1"`)
-            : undefined,
+        transformIndexHtml: (html) => {
+          if (!VITE_TUNNEL_URL) return html;
+
+          const importMap = `<script type="importmap">${JSON.stringify({
+            imports: {
+              "/@react-refresh": `${VITE_TUNNEL_URL}/@react-refresh`,
+              "/@vite/client": `${VITE_TUNNEL_URL}/@vite/client`,
+            },
+          })}</script>`;
+
+          return html
+            .replace(/src="\/(.*?)"/g, `src="${VITE_TUNNEL_URL}/$1"`)
+            .replace("<head>", `<head>\n    ${importMap}`);
+        },
       },
     ],
     server: {
       allowedHosts: true,
       cors: true,
-      hmr: false,
     },
   };
 });
