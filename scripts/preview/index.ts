@@ -76,14 +76,12 @@ const showSessionStatus = (sessions: WidgetSession[]): void => {
   console.log()
 }
 
-let cleanupPromise: Promise<void> | null = null
+let isCleaningUp = false
 
-const cleanup = (state: SessionState): Promise<void> => {
-  if (!cleanupPromise) cleanupPromise = runCleanup(state)
-  return cleanupPromise
-}
+const cleanup = (state: SessionState): void => {
+  if (isCleaningUp) return
+  isCleaningUp = true
 
-const runCleanup = async (state: SessionState): Promise<void> => {
   console.log()
   ui.info(chalk.yellow('Shutting down...'))
 
@@ -165,19 +163,9 @@ const main = async (): Promise<void> => {
     committed: false,
   }
 
-  process.on('SIGINT', async () => {
-    await cleanup(state)
-    process.exit(0)
-  })
-  process.on('SIGTERM', async () => {
-    await cleanup(state)
-    process.exit(0)
-  })
-  process.on('uncaughtException', async (err) => {
-    ui.error(err.message)
-    await cleanup(state)
-    process.exit(1)
-  })
+  process.on('SIGINT', () => { cleanup(state); process.exit(0) })
+  process.on('SIGTERM', () => { cleanup(state); process.exit(0) })
+  process.on('uncaughtException', (err) => { ui.error(err.message); cleanup(state); process.exit(1) })
 
   const ngrokSpinner = ui.spinner('Starting ngrok tunnels...')
   try {
@@ -208,7 +196,7 @@ const main = async (): Promise<void> => {
     commitSpinner.succeed('Registry committed and pushed.')
   } catch (e: unknown) {
     commitSpinner.fail(`git push failed: ${e instanceof Error ? e.message : String(e)}`)
-    await cleanup(state)
+    cleanup(state)
     process.exit(1)
   }
 
@@ -220,9 +208,10 @@ const main = async (): Promise<void> => {
       s.port,
       line => ui.widgetLog(s.widget.type, line)
     )
-    s.devProcess.process.on('exit', async (code) => {
-      if (code !== 0 && code !== null) {
-        await cleanup(state)
+    s.devProcess.process.on('exit', (code) => {
+      const isSignalExit = code === 130 || code === 2
+      if (code !== 0 && code !== null && !isSignalExit) {
+        cleanup(state)
         process.exit(1)
       }
     })
@@ -231,7 +220,7 @@ const main = async (): Promise<void> => {
   showSessionStatus(sessions)
 }
 
-main().catch(async (e: unknown) => {
+main().catch((e: unknown) => {
   ui.error(e instanceof Error ? e.message : String(e))
   process.exit(1)
 })
