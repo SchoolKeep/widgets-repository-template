@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "host": "tsx scripts/host/index.ts",
+    "preview": "tsx scripts/preview/index.ts",
     "build-registry": "bash ./bin/build-registry.sh"
   },
   "dependencies": {
