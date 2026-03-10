@@ -209,7 +209,6 @@ const main = async (): Promise<void> => {
     const widgetDir = path.join(REPO_ROOT, 'widgets', s.widget.type)
     s.devProcess = processes.startDevServer(
       widgetDir,
-      s.tunnelUrl!,
       s.port,
       line => ui.widgetLog(s.widget.type, line)
     )

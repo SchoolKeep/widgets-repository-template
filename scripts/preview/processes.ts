@@ -7,7 +7,6 @@ export interface DevProcess {
 
 export const startDevServer = (
   widgetDir: string,
-  tunnelUrl: string,
   port: number,
   onLog: (line: string) => void
 ): DevProcess => {
@@ -15,7 +14,7 @@ export const startDevServer = (
     cwd: widgetDir,
     shell: true,
     stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, VITE_TUNNEL_URL: tunnelUrl },
+    env: { ...process.env },
   })
   const handleData = (data: Buffer) =>
     data.toString().split('\n').filter(l => l.trim()).forEach(onLog)
