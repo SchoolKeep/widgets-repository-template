@@ -157,6 +157,44 @@
       "configuration": {
         "properties": [
           {
+            "name": "title",
+            "type": "text",
+            "label": "Title",
+            "defaultValue": "Vanilla Widget",
+            "rules": { "required": true }
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "label": "Description",
+            "defaultValue": "A widget built with plain JavaScript and Parcel."
+          }
+        ]
+      },
+      "containers": ["Full width"],
+      "defaultConfig": {
+        "title": "Vanilla Widget",
+        "description": "A widget built with plain JavaScript and Parcel."
+      },
+      "description": "A widget built with plain JavaScript and Parcel",
+      "settings": {
+        "configurable": true,
+        "editable": true,
+        "removable": true,
+        "shared": false,
+        "movable": false
+      },
+      "title": "Vanilla JS Widget",
+      "version": "1.0.0",
+      "widgetsLibrary": true,
+      "type": "vanilla_parcel",
+      "imageSrc": "widgets/vanilla_parcel/thumbnail.png"
+    },
+    {
+      "category": "Demo",
+      "configuration": {
+        "properties": [
+          {
             "name": "cards_per_row",
             "type": "number",
             "label": "Cards Per Row",
