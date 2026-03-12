@@ -81,6 +81,44 @@
       "configuration": {
         "properties": [
           {
+            "name": "title",
+            "type": "text",
+            "label": "Title",
+            "defaultValue": "Solid Widget",
+            "rules": { "required": true }
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "label": "Description",
+            "defaultValue": "A widget built with Solid.js and Vite."
+          }
+        ]
+      },
+      "containers": ["Full width"],
+      "defaultConfig": {
+        "title": "Solid Widget",
+        "description": "A widget built with Solid.js and Vite."
+      },
+      "description": "A widget built with Solid.js and Vite",
+      "settings": {
+        "configurable": true,
+        "editable": true,
+        "removable": true,
+        "shared": false,
+        "movable": false
+      },
+      "title": "Solid Widget",
+      "version": "1.0.0",
+      "widgetsLibrary": true,
+      "type": "solid_vite",
+      "imageSrc": "widgets/solid_vite/thumbnail.png"
+    },
+    {
+      "category": "Demo",
+      "configuration": {
+        "properties": [
+          {
             "name": "cards_per_row",
             "type": "number",
             "label": "Cards Per Row",
