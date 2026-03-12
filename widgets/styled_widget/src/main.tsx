@@ -3,12 +3,11 @@ import { App } from "./App";
 import type { WidgetSDK, WidgetProps } from "./types";
 
 const MOCK_PROPS: WidgetProps = {
-  title: "React Widget",
-  description: "A widget built with React and the Widget SDK.",
+  label: "Styled Widget",
 };
 
 export function init(sdk: WidgetSDK) {
-  const container = sdk.shadowRoot.querySelector("#react_widget-root") ?? sdk.shadowRoot;
+  const container = sdk.shadowRoot.querySelector("#styled_widget-root") ?? sdk.shadowRoot;
 
   sdk.whenReady().then(() => {
     const root = createRoot(container);
@@ -17,7 +16,7 @@ export function init(sdk: WidgetSDK) {
   });
 }
 
-const devContainer = document.getElementById("react_widget-root");
+const devContainer = document.getElementById("styled_widget-root");
 if (devContainer) {
   init({
     whenReady: () => Promise.resolve(),

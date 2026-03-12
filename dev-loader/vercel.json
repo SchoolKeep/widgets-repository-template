@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/:id-:port.html", "destination": "/api/loader?id=:id&port=:port" }
+  ]
+}

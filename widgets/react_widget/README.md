@@ -33,14 +33,14 @@ The `<link rel="modulepreload">` tags tell the browser to start fetching React m
 ## Development
 
 ```bash
-yarn install
-yarn dev
+bun install
+bun dev
 ```
 
 ## Build
 
 ```bash
-yarn build
+bun build
 ```
 
 The build output lands in `dist/` — a JS bundle (`widget.js`), a CSS file (`widget.css`), and an `index.html` that references them. The import map is expected to already be present on the page.
