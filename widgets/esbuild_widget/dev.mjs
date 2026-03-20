@@ -8,5 +8,4 @@ const ctx = await esbuild.context({
 });
 
 await ctx.watch();
-const { port } = await ctx.serve({ servedir: "public", port: 5400 });
-console.log(`Dev server running at http://localhost:${port}`);
+await ctx.serve({ servedir: "public", port: 5400 });
