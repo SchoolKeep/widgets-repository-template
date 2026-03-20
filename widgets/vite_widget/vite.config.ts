@@ -1,12 +1,10 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig({
-  plugins: [react()],
-  server: { port: 5174, strictPort: true },
+  server: { port: 5179, strictPort: true },
   build: {
     lib: {
-      entry: "src/main.tsx",
+      entry: "src/main.ts",
       formats: ["es"],
       fileName: "widget",
     },

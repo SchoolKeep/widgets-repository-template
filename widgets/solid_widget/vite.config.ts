@@ -1,9 +1,9 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import solid from "vite-plugin-solid";
 
 export default defineConfig({
-  plugins: [react()],
-  server: { port: 5174, strictPort: true },
+  plugins: [solid()],
+  server: { port: 5177, strictPort: true },
   build: {
     lib: {
       entry: "src/main.tsx",

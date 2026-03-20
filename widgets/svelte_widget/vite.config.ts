@@ -1,12 +1,12 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 
 export default defineConfig({
-  plugins: [react()],
-  server: { port: 5174, strictPort: true },
+  plugins: [svelte()],
+  server: { port: 5176, strictPort: true },
   build: {
     lib: {
-      entry: "src/main.tsx",
+      entry: "src/main.ts",
       formats: ["es"],
       fileName: "widget",
     },
