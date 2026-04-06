@@ -192,7 +192,7 @@
     }
   ]
   "scripts": [
-    { "name": "analytics", "path": "global.js", "description": "global script for all widgets",
+    { "name": "analytics", "path": "scripts/global.js", "description": "global script for all widgets",
     "placement": "head" }
   ],
   "stylesheets": [
