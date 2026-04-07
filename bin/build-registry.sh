@@ -5,6 +5,9 @@
 # with each widgets/<name>/widget.json, resolving paths from widget-dir-relative
 # to repository-root-relative. Each widget.json must include either a "source"
 # block (repo-hosted) or a "content" block (external).
+#
+# Also scans each widget directory for connectors.json, validates connector
+# definitions, and generates connectors_registry.json.
 
 set -e
 
@@ -20,6 +23,13 @@ CONTENT_DEFAULT_METHOD="GET"
 CONTENT_DEFAULT_REQUIRES_AUTH="false"
 CONTENT_DEFAULT_CACHE_STRATEGY="no-cache"
 
+STYLESHEET_DEFAULT_CONTENT_FILE="style.css"
+STYLESHEET_DEFAULT_RULES='[{"field":"pageType","operator":"in","value":["global"]}]'
+
+SCRIPT_DEFAULT_CONTENT_FILE="script.js"
+SCRIPT_DEFAULT_RULES='[{"field":"pageType","operator":"in","value":["global"]}]'
+SCRIPT_DEFAULT_PLACEMENT="head"
+
 # -----------------------------------------------------------------------------
 
 RED='\033[0;31m'
@@ -28,7 +38,10 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 WIDGETS_DIR="widgets"
+STYLESHEETS_DIR="stylesheets"
+SCRIPTS_DIR="scripts"
 OUTPUT_FILE="widget_registry.json"
+CONNECTORS_OUTPUT_FILE="connectors_registry.json"
 
 DRY_RUN=false
 VALIDATE_ONLY=false
@@ -48,7 +61,7 @@ while [[ $# -gt 0 ]]; do
       echo ""
       echo "Options:"
       echo "  --dry-run    Preview the output without writing to file"
-      echo "  --validate   Validate existing widget_registry.json"
+      echo "  --validate   Validate existing widget_registry.json and connectors_registry.json"
       echo "  --help       Show this help message"
       exit 0
       ;;
@@ -114,8 +127,53 @@ if [ "$VALIDATE_ONLY" = true ]; then
   if [ $bad -eq 1 ]; then
     exit 1
   fi
+  stylesheet_count=$(jq '.stylesheets // [] | length' "$OUTPUT_FILE")
+  script_count=$(jq '.scripts // [] | length' "$OUTPUT_FILE")
   success "Valid JSON in $OUTPUT_FILE"
-  success "Found $widget_count widgets in registry"
+  success "Found $widget_count widgets, $stylesheet_count stylesheets, and $script_count scripts in registry"
+
+  # -------------------------------------------------------------------------
+  # Validate connectors_registry.json (if it exists)
+  # -------------------------------------------------------------------------
+  if [ -f "$CONNECTORS_OUTPUT_FILE" ]; then
+    if ! jq empty "$CONNECTORS_OUTPUT_FILE" 2>/dev/null; then
+      error "Invalid JSON in $CONNECTORS_OUTPUT_FILE"
+      exit 1
+    fi
+    if ! jq -e '.connectors | type == "array"' "$CONNECTORS_OUTPUT_FILE" > /dev/null 2>&1; then
+      error "$CONNECTORS_OUTPUT_FILE missing top-level connectors array"
+      exit 1
+    fi
+    connector_count=$(jq '.connectors | length' "$CONNECTORS_OUTPUT_FILE")
+    connector_bad=0
+    for i in $(seq 0 $((connector_count - 1))); do
+      c=$(jq -c ".connectors[$i]" "$CONNECTORS_OUTPUT_FILE")
+      c_name=$(echo "$c" | jq -r '.name // empty')
+      c_url=$(echo "$c" | jq -r '.url // empty')
+      if [ -z "$c_name" ]; then
+        error "Connector at index $i missing required field: name"
+        connector_bad=1
+      fi
+      if [ -z "$c_url" ]; then
+        error "Connector at index $i missing required field: url"
+        connector_bad=1
+      fi
+    done
+    # Check for duplicate permalinks
+    dup_permalinks=$(jq -r '.connectors[].permalink // empty' "$CONNECTORS_OUTPUT_FILE" | sort | uniq -d)
+    if [ -n "$dup_permalinks" ]; then
+      for dup in $dup_permalinks; do
+        error "Duplicate connector permalink: $dup"
+      done
+      connector_bad=1
+    fi
+    if [ $connector_bad -eq 1 ]; then
+      exit 1
+    fi
+    success "Valid JSON in $CONNECTORS_OUTPUT_FILE"
+    success "Found $connector_count connectors in registry"
+  fi
+
   exit 0
 fi
 
@@ -145,6 +203,15 @@ normalize_widget_path() {
   else
     echo "${WIDGETS_DIR}/${name}/${raw}"
   fi
+}
+
+# -----------------------------------------------------------------------------
+# Generate permalink from connector name
+# Lowercase, replace spaces/special chars with dashes, collapse multiple dashes
+# -----------------------------------------------------------------------------
+generate_permalink() {
+  local name="$1"
+  echo "$name" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//'
 }
 
 WIDGETS_JSON="[]"
@@ -361,16 +428,296 @@ fi
 
 success "Successfully processed $widget_count widget(s)"
 
+# ---- Process stylesheets ----
+STYLESHEETS_JSON="[]"
+stylesheet_count=0
+
+if [ -d "$STYLESHEETS_DIR" ]; then
+  for stylesheet_dir in "$STYLESHEETS_DIR"/*; do
+    [ -d "$stylesheet_dir" ] || continue
+    stylesheet_name=$(basename "$stylesheet_dir")
+    stylesheet_config="$stylesheet_dir/stylesheet.json"
+
+    echo ""
+    echo "Processing stylesheet: $stylesheet_name"
+
+    if [ ! -f "$stylesheet_config" ]; then
+      error "  Missing stylesheet.json in $stylesheet_dir"
+      ((error_count++))
+      continue
+    fi
+
+    if ! jq empty "$stylesheet_config" 2>/dev/null; then
+      error "  Invalid JSON in $stylesheet_config"
+      ((error_count++))
+      continue
+    fi
+
+    ss_name=$(jq -r '.name // empty' "$stylesheet_config")
+    if [ -z "$ss_name" ]; then
+      error "  Missing required field: name"
+      ((error_count++))
+      continue
+    fi
+
+    ss_content_file=$(jq -r '.contentFile // empty' "$stylesheet_config")
+    if [ -n "$ss_content_file" ] && [ "$ss_content_file" != "null" ]; then
+      ss_file_name="$ss_content_file"
+    else
+      ss_file_name="$STYLESHEET_DEFAULT_CONTENT_FILE"
+    fi
+
+    if [ ! -f "$stylesheet_dir/$ss_file_name" ]; then
+      error "  Missing $ss_file_name in $stylesheet_dir"
+      ((error_count++))
+      continue
+    fi
+
+    ss_path="./${STYLESHEETS_DIR}/${stylesheet_name}/${ss_file_name}"
+
+    stylesheet=$(jq -n \
+      --argjson default_rules "$STYLESHEET_DEFAULT_RULES" \
+      --slurpfile ss "$stylesheet_config" \
+      --arg path "$ss_path" \
+      '{"rules": $default_rules} * $ss[0] * {"path": $path} | del(.contentFile)')
+
+    STYLESHEETS_JSON=$(echo "$STYLESHEETS_JSON" | jq --argjson ss "$stylesheet" '. + [$ss]')
+    success "  Processed: $ss_name"
+    ((stylesheet_count++))
+  done
+
+  if [ $error_count -gt 0 ]; then
+    error "Failed to process some stylesheet(s)"
+    exit 1
+  fi
+
+  if [ $stylesheet_count -gt 0 ]; then
+    echo ""
+    success "Successfully processed $stylesheet_count stylesheet(s)"
+  fi
+fi
+
+# ---- Process scripts ----
+SCRIPTS_JSON="[]"
+script_count=0
+
+if [ -d "$SCRIPTS_DIR" ]; then
+  for script_dir in "$SCRIPTS_DIR"/*; do
+    [ -d "$script_dir" ] || continue
+    script_name=$(basename "$script_dir")
+    script_config="$script_dir/script.json"
+
+    echo ""
+    echo "Processing script: $script_name"
+
+    if [ ! -f "$script_config" ]; then
+      error "  Missing script.json in $script_dir"
+      ((error_count++))
+      continue
+    fi
+
+    if ! jq empty "$script_config" 2>/dev/null; then
+      error "  Invalid JSON in $script_config"
+      ((error_count++))
+      continue
+    fi
+
+    sc_name=$(jq -r '.name // empty' "$script_config")
+    if [ -z "$sc_name" ]; then
+      error "  Missing required field: name"
+      ((error_count++))
+      continue
+    fi
+
+    sc_content_file=$(jq -r '.contentFile // empty' "$script_config")
+    if [ -n "$sc_content_file" ] && [ "$sc_content_file" != "null" ]; then
+      sc_file_name="$sc_content_file"
+    else
+      sc_file_name="$SCRIPT_DEFAULT_CONTENT_FILE"
+    fi
+
+    if [ ! -f "$script_dir/$sc_file_name" ]; then
+      error "  Missing $sc_file_name in $script_dir"
+      ((error_count++))
+      continue
+    fi
+
+    sc_path="./${SCRIPTS_DIR}/${script_name}/${sc_file_name}"
+
+    script=$(jq -n \
+      --argjson default_rules "$SCRIPT_DEFAULT_RULES" \
+      --arg default_placement "$SCRIPT_DEFAULT_PLACEMENT" \
+      --slurpfile sc "$script_config" \
+      --arg path "$sc_path" \
+      '{"rules": $default_rules, "placement": $default_placement} * $sc[0] * {"path": $path} | del(.contentFile)')
+
+    SCRIPTS_JSON=$(echo "$SCRIPTS_JSON" | jq --argjson sc "$script" '. + [$sc]')
+    success "  Processed: $sc_name"
+    ((script_count++))
+  done
+
+  if [ $error_count -gt 0 ]; then
+    error "Failed to process some script(s)"
+    exit 1
+  fi
+
+  if [ $script_count -gt 0 ]; then
+    echo ""
+    success "Successfully processed $script_count script(s)"
+  fi
+fi
+
+# ---- Assemble widget registry ----
 REGISTRY_JSON=$(jq -n --argjson widgets "$WIDGETS_JSON" '{widgets: $widgets}')
+if [ $stylesheet_count -gt 0 ]; then
+  REGISTRY_JSON=$(echo "$REGISTRY_JSON" | jq --argjson stylesheets "$STYLESHEETS_JSON" '. + {stylesheets: $stylesheets}')
+fi
+if [ $script_count -gt 0 ]; then
+  REGISTRY_JSON=$(echo "$REGISTRY_JSON" | jq --argjson scripts "$SCRIPTS_JSON" '. + {scripts: $scripts}')
+fi
+
+# -----------------------------------------------------------------------------
+# Connector processing
+# -----------------------------------------------------------------------------
+
+echo ""
+echo "================================"
+echo ""
+echo "Processing connectors..."
+
+CONNECTORS_JSON="[]"
+connector_count=0
+connector_error_count=0
+ALL_PERMALINKS=""
+
+for widget_dir in "$WIDGETS_DIR"/*; do
+  [ -d "$widget_dir" ] || continue
+  widget_name=$(basename "$widget_dir")
+  connectors_config="$widget_dir/connectors.json"
+
+  [ -f "$connectors_config" ] || continue
+
+  echo ""
+  echo "Processing connectors: $widget_name"
+
+  if ! jq empty "$connectors_config" 2>/dev/null; then
+    error "  Invalid JSON in $connectors_config"
+    ((connector_error_count++))
+    continue
+  fi
+
+  if ! jq -e '.connectors | type == "array"' "$connectors_config" > /dev/null 2>&1; then
+    error "  $connectors_config missing top-level connectors array"
+    ((connector_error_count++))
+    continue
+  fi
+
+  num_connectors=$(jq '.connectors | length' "$connectors_config")
+
+  for i in $(seq 0 $((num_connectors - 1))); do
+    c=$(jq -c ".connectors[$i]" "$connectors_config")
+    c_name=$(echo "$c" | jq -r '.name // empty')
+    c_url=$(echo "$c" | jq -r '.url // empty')
+    c_method=$(echo "$c" | jq -r '.method // empty')
+    c_permalink=$(echo "$c" | jq -r '.permalink // empty')
+
+    # Validate name (required, non-empty string, max 255 chars)
+    if [ -z "$c_name" ]; then
+      error "  Connector at index $i missing required field: name"
+      ((connector_error_count++))
+      continue
+    fi
+    name_length=${#c_name}
+    if [ "$name_length" -gt 255 ]; then
+      error "  Connector '$c_name' name exceeds 255 characters"
+      ((connector_error_count++))
+      continue
+    fi
+
+    # Validate url (required, non-empty string)
+    if [ -z "$c_url" ]; then
+      error "  Connector '$c_name' missing required field: url"
+      ((connector_error_count++))
+      continue
+    fi
+
+    # Validate method if present (must be GET/POST/PUT/DELETE/PATCH/OPTIONS/HEAD)
+    if [ -n "$c_method" ]; then
+      case "$c_method" in
+        GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) ;;
+        *)
+          error "  Connector '$c_name' has invalid method: $c_method (must be GET/POST/PUT/DELETE/PATCH/OPTIONS/HEAD)"
+          ((connector_error_count++))
+          continue
+          ;;
+      esac
+    fi
+
+    # Generate permalink from name if not provided
+    if [ -z "$c_permalink" ]; then
+      c_permalink=$(generate_permalink "$c_name")
+      warning "  Connector '$c_name' missing permalink, auto-generated: $c_permalink"
+      c=$(echo "$c" | jq --arg permalink "$c_permalink" '. + {permalink: $permalink}')
+    fi
+
+    # Validate permalink format (must match ^[a-z0-9]+(-[a-z0-9]+)*$)
+    if ! echo "$c_permalink" | grep -qE '^[a-z0-9]+(-[a-z0-9]+)*$'; then
+      error "  Connector '$c_name' has invalid permalink format: $c_permalink (must match ^[a-z0-9]+(-[a-z0-9]+)*\$)"
+      ((connector_error_count++))
+      continue
+    fi
+
+    ALL_PERMALINKS="$ALL_PERMALINKS $c_permalink"
+
+    CONNECTORS_JSON=$(echo "$CONNECTORS_JSON" | jq --argjson connector "$c" '. + [$connector]')
+    success "  Processed connector: $c_name ($c_permalink)"
+    ((connector_count++))
+  done
+done
+
+# Check permalink uniqueness across ALL connectors
+if [ -n "$ALL_PERMALINKS" ]; then
+  dup_permalinks=$(echo "$ALL_PERMALINKS" | tr ' ' '\n' | sort | uniq -d)
+  if [ -n "$dup_permalinks" ]; then
+    for dup in $dup_permalinks; do
+      error "Duplicate connector permalink: $dup"
+    done
+    ((connector_error_count++))
+  fi
+fi
+
+echo ""
+echo "================================"
+
+if [ $connector_error_count -gt 0 ]; then
+  error "Failed to process connector(s) with $connector_error_count error(s)"
+  exit 1
+fi
+
+if [ $connector_count -gt 0 ]; then
+  success "Successfully processed $connector_count connector(s)"
+  CONNECTORS_REGISTRY_JSON=$(jq -n --argjson connectors "$CONNECTORS_JSON" '{connectors: $connectors}')
+else
+  warning "No connectors found to process"
+  CONNECTORS_REGISTRY_JSON='{"connectors":[]}'
+fi
+
+# -----------------------------------------------------------------------------
+# Write output files (both at once, after all validation passes)
+# -----------------------------------------------------------------------------
 
 if [ "$DRY_RUN" = true ]; then
   echo ""
   warning "DRY RUN MODE - No files will be written"
   echo ""
   echo "$REGISTRY_JSON" | jq .
+  echo ""
+  echo "$CONNECTORS_REGISTRY_JSON" | jq .
 else
   echo "$REGISTRY_JSON" | jq . > "$OUTPUT_FILE"
   success "Written to $OUTPUT_FILE"
+  echo "$CONNECTORS_REGISTRY_JSON" | jq . > "$CONNECTORS_OUTPUT_FILE"
+  success "Written to $CONNECTORS_OUTPUT_FILE"
 fi
 
 echo ""
