@@ -21,11 +21,15 @@ Common problems when building SDK-based widgets (React, Angular, Vue, etc.) for 
 
 **Correct output:**
 ```html
-<script type="module" src="./polyfills.js"></script>
-<script type="module" src="./widget.js"></script>
+<script type="module" src="./main.js"></script>
 ```
 
-Most bundlers (Vite, webpack, Angular CLI) produce a full document by default. You need a post-build step to strip the shell or write the fragment yourself. For Angular, `post-build.mjs` handles this explicitly rather than trying to parse Angular's output.
+Most bundlers (Vite, webpack, Angular CLI) produce a full document by default. You need a post-build step to strip the shell or write the fragment yourself. For Angular, set `"index": false` in `angular.json` and use a `post-build.mjs` to write the fragment explicitly:
+
+```javascript
+import { writeFileSync } from "fs";
+writeFileSync("dist/index.html", '<script type="module" src="./main.js"></script>\n');
+```
 
 Note: this applies equally to production builds (`dist/index.html`) **and** to what hubforge preview serves to the platform from the dev server. Both paths must return a fragment.
 
@@ -86,20 +90,22 @@ If you need your post-build script to run as ESM, name it `.mjs` — the file ex
 
 ---
 
-## 5. Angular: `propsChanged` callbacks fire outside Angular's zone
+## 5. Angular with zone.js: `propsChanged` callbacks require `NgZone.run()`
+
+> **Angular 20+ with zoneless:** Skip this pitfall. If you are using `provideZonelessChangeDetection()` (the default from Angular 20), signal writes trigger change detection automatically — `NgZone` is not involved. See pitfall #6.
 
 The platform's SDK fires `propsChanged` (and other events) via plain JavaScript callbacks — not through a patched async primitive like `setTimeout` or `Promise`. Zone.js only patches browser APIs; it has no way to know about arbitrary third-party callbacks.
 
 If you update component state inside a `propsChanged` callback without wrapping it in `NgZone.run()`, Angular's change detection will not trigger and the template will not re-render.
 
-**Broken:**
+**Broken (zone.js only):**
 ```typescript
 this.sdk.on("propsChanged", (data) => {
   this.props.set(data); // signal write marks view dirty, but no CD cycle fires
 });
 ```
 
-**Correct:**
+**Correct (zone.js only):**
 ```typescript
 private readonly ngZone = inject(NgZone);
 
@@ -114,17 +120,31 @@ constructor() {
 
 `NgZone.run()` forces a CD cycle regardless of how the callback was delivered. It is the correct and required pattern when using zone.js with any external callback source.
 
-`ChangeDetectionStrategy.OnPush` is compatible with this pattern: when `NgZone.run()` triggers a CD cycle and the signal has been written, Angular flushes the dirty signal view correctly. Using `OnPush` with signals is recommended — it avoids unnecessary checks of the full component tree.
-
-If you want to remove `NgZone` entirely, see pitfall #6 for the requirements and trade-offs of the zoneless approach.
-
 ---
 
-## 6. Angular zoneless (`provideExperimentalZonelessChangeDetection`) is incompatible with external SDK callbacks
+## 6. Angular zoneless: signal writes from SDK callbacks work correctly
 
-The zoneless API requires all state changes to go through Angular's reactive primitives (signals, async pipe, etc.). External SDK callbacks bypass these primitives entirely. If you use `componentRef.setInput()` from outside Angular's reactive graph, or update a plain class property in a callback, there is no mechanism to schedule change detection.
+Angular 20 graduated the zoneless API (`provideZonelessChangeDetection()`) to stable and made it the default. **This is the recommended approach for new widgets.**
 
-**Use zone.js for widgets that receive dynamic props from the platform SDK.** Reserve the zoneless API for widgets that are display-only and never update after initial render.
+With zoneless, the change detection scheduler reacts directly to signal writes — including writes that originate from outside Angular's context, such as SDK callbacks. No `NgZone.run()` wrapper is needed.
+
+**Correct (zoneless, Angular 20+):**
+```typescript
+constructor() {
+  this.destroyRef.onDestroy(
+    this.sdk.on("propsChanged", (data) => {
+      this.props.set(data);
+    }),
+  );
+}
+```
+
+Requirements for zoneless to work correctly:
+- Use `provideZonelessChangeDetection()` in your bootstrap providers (do not load `zone.js`)
+- Update state via signals (`signal()`, `computed()`) — not plain class properties
+- Use `ChangeDetectionStrategy.OnPush` on your component
+
+If you are using `zone.js` (Angular 19 or earlier default), see pitfall #5 instead.
 
 ---
 

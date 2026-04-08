@@ -16,7 +16,7 @@
               "base": "dist",
               "browser": ""
             },
-            "index": "src/index.html",
+            "index": false,
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "polyfills": [],
