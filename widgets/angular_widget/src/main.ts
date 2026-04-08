@@ -1,5 +1,5 @@
 import { createApplication } from "@angular/platform-browser";
-import { provideZonelessChangeDetection } from "@angular/core";
+import { ApplicationRef, provideZonelessChangeDetection } from "@angular/core";
 import { AppComponent } from "./app/app.component";
 import { WIDGET_SDK } from "./widget-sdk.token";
 import { HOST_ELEMENT } from "./constants";
@@ -10,10 +10,11 @@ let initialized = false;
 export async function init(sdk: WidgetSDK) {
   if (initialized) return;
   initialized = true;
+  let appRef: ApplicationRef | null = null;
   try {
     await sdk.whenReady();
     const host = document.createElement(HOST_ELEMENT);
-    const appRef = await createApplication({
+    appRef = await createApplication({
       providers: [
         provideZonelessChangeDetection(),
         { provide: WIDGET_SDK, useValue: sdk },
@@ -21,17 +22,19 @@ export async function init(sdk: WidgetSDK) {
     });
     appRef.bootstrap(AppComponent, host);
     sdk.getContainer().appendChild(host);
+    const app = appRef;
     const unsubDestroy = sdk.on("destroy", () => {
       unsubDestroy();
       initialized = false;
       try {
-        appRef.destroy();
+        app.destroy();
       } finally {
         host.remove();
       }
     });
   } catch (e) {
     initialized = false;
+    appRef?.destroy();
     throw e;
   }
 }
