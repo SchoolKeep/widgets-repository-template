@@ -108,8 +108,8 @@
         "configurable": true,
         "editable": true,
         "removable": true,
-        "shared": false,
-        "movable": false
+        "shared": true,
+        "movable": true
       },
       "title": "Card Grid",
       "version": "1.0.0",
@@ -131,8 +131,8 @@
         "configurable": true,
         "editable": true,
         "removable": true,
-        "shared": false,
-        "movable": false
+        "shared": true,
+        "movable": true
       },
       "title": "Demo widget",
       "version": "1.0.0",
@@ -177,8 +177,8 @@
         "configurable": true,
         "editable": true,
         "removable": true,
-        "shared": false,
-        "movable": false
+        "shared": true,
+        "movable": true
       },
       "title": "React Widget",
       "version": "1.0.0",
