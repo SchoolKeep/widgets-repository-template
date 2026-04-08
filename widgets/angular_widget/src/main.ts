@@ -11,9 +11,10 @@ export async function init(sdk: WidgetSDK) {
   if (initialized) return;
   initialized = true;
   let appRef: ApplicationRef | null = null;
+  let host: HTMLElement | null = null;
   try {
     await sdk.whenReady();
-    const host = document.createElement(HOST_ELEMENT);
+    host = document.createElement(HOST_ELEMENT);
     appRef = await createApplication({
       providers: [
         provideZonelessChangeDetection(),
@@ -23,18 +24,20 @@ export async function init(sdk: WidgetSDK) {
     appRef.bootstrap(AppComponent, host);
     sdk.getContainer().appendChild(host);
     const app = appRef;
+    const elem = host;
     const unsubDestroy = sdk.on("destroy", () => {
       unsubDestroy();
       initialized = false;
       try {
         app.destroy();
       } finally {
-        host.remove();
+        elem.remove();
       }
     });
   } catch (e) {
     initialized = false;
     appRef?.destroy();
+    host?.remove();
     throw e;
   }
 }
