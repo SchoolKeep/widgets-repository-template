@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  NgZone,
   ViewEncapsulation,
   inject,
   signal,
@@ -28,14 +27,13 @@ import type { WidgetProps } from "../types";
 })
 export class AppComponent {
   private readonly sdk = inject(WIDGET_SDK);
-  private readonly ngZone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
   readonly props = signal<WidgetProps>(this.sdk.getProps());
 
   constructor() {
     this.destroyRef.onDestroy(
       this.sdk.on("propsChanged", (data) => {
-        this.ngZone.run(() => this.props.set(data));
+        this.props.set(data);
       }),
     );
   }
