@@ -36,8 +36,11 @@ export async function init(sdk: WidgetSDK) {
     });
   } catch (e) {
     initialized = false;
-    appRef?.destroy();
-    host?.remove();
+    try {
+      appRef?.destroy();
+    } finally {
+      host?.remove();
+    }
     throw e;
   }
 }
