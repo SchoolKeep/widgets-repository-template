@@ -189,6 +189,52 @@
         "entry": "index.html"
       },
       "imageSrc": "widgets/react_widget/thumbnail.png"
+    },
+    {
+      "category": "Demo",
+      "configuration": {
+        "properties": [
+          {
+            "name": "title",
+            "type": "text",
+            "label": "Title",
+            "defaultValue": "Angular Widget",
+            "rules": {
+              "required": true
+            }
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "label": "Description",
+            "defaultValue": "A widget built with Angular and the Widget SDK."
+          }
+        ]
+      },
+      "containers": [
+        "Full width"
+      ],
+      "defaultConfig": {
+        "title": "Angular Widget",
+        "description": "A widget built with Angular and the Widget SDK."
+      },
+      "description": "An Angular widget using the ESM module pattern with Widget SDK",
+      "settings": {
+        "configurable": true,
+        "editable": true,
+        "removable": true,
+        "shared": true,
+        "movable": true
+      },
+      "title": "Angular Widget",
+      "version": "1.0.0",
+      "widgetsLibrary": true,
+      "type": "angular_widget",
+      "source": {
+        "path": "widgets/angular_widget/dist",
+        "entry": "index.html"
+      },
+      "imageSrc": "widgets/angular_widget/thumbnail.png"
     }
   ],
   "stylesheets": [
