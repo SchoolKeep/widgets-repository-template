@@ -18,12 +18,17 @@ export interface CountryCardProps {
   country: Country;
 }
 
+export interface AppProps {
+  header: string;
+}
+
 export interface WidgetSDK {
   whenReady(): Promise<void>;
   shadowRoot: ShadowRoot;
   getContainer(): Element;
   on(event: string, callback: (data: unknown) => void): () => void;
   emit(event: string, data?: unknown): void;
+  getProps(): Record<string, unknown>;
 }
 
 declare global {

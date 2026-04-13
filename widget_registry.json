@@ -17,6 +17,19 @@
       "version": "1.0.0",
       "widgetsLibrary": true,
       "type": "countries-angular",
+      "configuration": {
+        "properties": [
+          {
+            "name": "header",
+            "type": "text",
+            "label": "Header",
+            "defaultValue": "Angular"
+          }
+        ]
+      },
+      "defaultConfig": {
+        "header": "Angular"
+      },
       "source": {
         "path": "widgets/countries-angular/dist",
         "entry": "index.html"
@@ -63,6 +76,19 @@
       "version": "1.0.0",
       "widgetsLibrary": true,
       "type": "countries-react",
+      "configuration": {
+        "properties": [
+          {
+            "name": "header",
+            "type": "text",
+            "label": "Header",
+            "defaultValue": "React"
+          }
+        ]
+      },
+      "defaultConfig": {
+        "header": "React"
+      },
       "source": {
         "path": "widgets/countries-react/dist",
         "entry": "index.html"
@@ -86,6 +112,19 @@
       "version": "1.0.0",
       "widgetsLibrary": true,
       "type": "countries-vanilla",
+      "configuration": {
+        "properties": [
+          {
+            "name": "header",
+            "type": "text",
+            "label": "Header",
+            "defaultValue": "Vanilla JS"
+          }
+        ]
+      },
+      "defaultConfig": {
+        "header": "Vanilla JS"
+      },
       "source": {
         "path": "widgets/countries-vanilla/dist",
         "entry": "index.html"
@@ -109,6 +148,19 @@
       "version": "1.0.0",
       "widgetsLibrary": true,
       "type": "countries-vue",
+      "configuration": {
+        "properties": [
+          {
+            "name": "header",
+            "type": "text",
+            "label": "Header",
+            "defaultValue": "Vue"
+          }
+        ]
+      },
+      "defaultConfig": {
+        "header": "Vue"
+      },
       "source": {
         "path": "widgets/countries-vue/dist",
         "entry": "index.html"

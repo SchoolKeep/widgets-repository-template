@@ -20,6 +20,7 @@ export interface WidgetSDK {
   getContainer(): Element;
   on(event: string, callback: (data: unknown) => void): () => void;
   emit(event: string, data?: unknown): void;
+  getProps(): Record<string, unknown>;
 }
 
 declare global {

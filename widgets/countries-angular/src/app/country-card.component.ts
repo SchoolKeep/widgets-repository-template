@@ -6,7 +6,7 @@ import type { Country } from "../types";
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <li class="country-item" [attr.aria-label]="country().name">
+    <li class="country-item">
       <img
         class="country-flag"
         [src]="country().flag"

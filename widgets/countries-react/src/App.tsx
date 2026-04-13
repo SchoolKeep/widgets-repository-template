@@ -1,15 +1,16 @@
 import { useCountries } from "./hooks/useCountries";
 import { CountryCard } from "./CountryCard";
 import { TOP_COUNTRIES_COUNT } from "./constants";
+import type { AppProps } from "./types";
 
 const SKELETON_KEYS = Array.from({ length: TOP_COUNTRIES_COUNT }, (_, i) => i);
 
-export const App = () => {
+export const App = ({ header }: AppProps) => {
   const { countries, loading, error } = useCountries();
 
   return (
     <section className="react-widget-section">
-      <p className="widget-framework-header">React</p>
+      <p className="widget-framework-header">{header}</p>
       {loading && (
         <ul role="status" aria-label="Loading country data" className="country-list">
           {SKELETON_KEYS.map((i) => (

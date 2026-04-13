@@ -1,3 +1,5 @@
+import type { InjectionKey, Ref } from "vue";
+
 export interface RawCountry {
   name: { common: string };
   capital?: string[];
@@ -20,7 +22,10 @@ export interface WidgetSDK {
   getContainer(): Element;
   on(event: string, callback: (data: unknown) => void): () => void;
   emit(event: string, data?: unknown): void;
+  getProps(): Record<string, unknown>;
 }
+
+export const WIDGET_HEADER_KEY: InjectionKey<Ref<string>> = Symbol("widgetHeader");
 
 declare global {
   interface Window {

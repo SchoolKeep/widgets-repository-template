@@ -1,3 +1,5 @@
+import { InjectionToken } from "@angular/core";
+
 export interface RawCountry {
   name: { common: string };
   capital?: string[];
@@ -20,7 +22,10 @@ export interface WidgetSDK {
   getContainer(): Element;
   on(event: string, callback: (data: unknown) => void): () => void;
   emit(event: string, data?: unknown): void;
+  getProps(): Record<string, unknown>;
 }
+
+export const WIDGET_SDK_TOKEN = new InjectionToken<WidgetSDK>("WidgetSDK");
 
 declare global {
   interface Window {

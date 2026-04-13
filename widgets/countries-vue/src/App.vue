@@ -1,14 +1,17 @@
 <script setup lang="ts">
+import { inject, ref } from "vue";
 import { useCountries } from "./composables/useCountries";
 import CountryCard from "./CountryCard.vue";
 import { TOP_COUNTRIES_COUNT } from "./constants";
+import { WIDGET_HEADER_KEY } from "./types";
 
 const { countries, loading, error } = useCountries();
+const header = inject(WIDGET_HEADER_KEY, ref("Vue"));
 </script>
 
 <template>
   <section class="vue-widget-section">
-    <p class="widget-framework-header">Vue</p>
+    <p class="widget-framework-header">{{ header }}</p>
     <ul v-if="loading" role="status" aria-label="Loading country data" class="country-list">
       <li v-for="n in TOP_COUNTRIES_COUNT" :key="n" class="country-item country-item--skeleton">
         <div class="country-flag country-flag--skeleton" />

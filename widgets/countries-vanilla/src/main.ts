@@ -1,5 +1,5 @@
 import type { Country, RawCountry, WidgetSDK } from "./types";
-import { CONNECTOR_PERMALINK, TOP_COUNTRIES_COUNT } from "./constants";
+import { CONNECTOR_PERMALINK, HEADER_PROP, TOP_COUNTRIES_COUNT } from "./constants";
 
 const createSkeleton = (): HTMLElement => {
   const list = document.createElement("ul");
@@ -29,7 +29,7 @@ const createCard = (country: Country): HTMLElement => {
   img.className = "country-flag";
   img.src = country.flag;
   img.alt = "Flag of " + country.name;
-  img.onerror = () => { img.style.opacity = "0"; };
+  img.onerror = () => (img.style.opacity = "0");
 
   const details = document.createElement("div");
   details.className = "country-details";
@@ -77,6 +77,11 @@ const renderError = (root: Element, message: string) => {
   root.appendChild(errorDiv);
 };
 
+const extractHeader = (sdk: WidgetSDK): string => {
+  const v = sdk.getProps()[HEADER_PROP];
+  return typeof v === "string" && v.trim() ? v : "Vanilla JS";
+};
+
 export async function init(sdk: WidgetSDK) {
   await sdk.whenReady();
 
@@ -88,7 +93,7 @@ export async function init(sdk: WidgetSDK) {
 
   const header = document.createElement("p");
   header.className = "widget-framework-header";
-  header.textContent = "Vanilla JS";
+  header.textContent = extractHeader(sdk);
 
   const contentDiv = document.createElement("div");
 
@@ -96,8 +101,10 @@ export async function init(sdk: WidgetSDK) {
   section.appendChild(contentDiv);
   root.appendChild(section);
 
+  const offProps = sdk.on("propsChanged", () => (header.textContent = extractHeader(sdk)));
   const off = sdk.on("destroy", () => {
     off();
+    offProps();
     cancelled = true;
     root.innerHTML = "";
   });

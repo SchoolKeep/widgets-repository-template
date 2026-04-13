@@ -1,7 +1,7 @@
 import { createApplication } from "@angular/platform-browser";
 import { provideZonelessChangeDetection } from "@angular/core";
 import { AppComponent } from "./app/app.component";
-import type { WidgetSDK } from "./types";
+import { WIDGET_SDK_TOKEN, type WidgetSDK } from "./types";
 
 let initialized = false;
 
@@ -11,11 +11,15 @@ export async function init(sdk: WidgetSDK) {
   await sdk.whenReady();
   const host = document.createElement("countries-angular-root");
   const appRef = await createApplication({
-    providers: [provideZonelessChangeDetection()],
+    providers: [
+      provideZonelessChangeDetection(),
+      { provide: WIDGET_SDK_TOKEN, useValue: sdk },
+    ],
   });
   appRef.bootstrap(AppComponent, host);
   sdk.getContainer().appendChild(host);
-  sdk.on("destroy", () => {
+  const offDestroy = sdk.on("destroy", () => {
+    offDestroy();
     initialized = false;
     appRef.destroy();
     host.remove();

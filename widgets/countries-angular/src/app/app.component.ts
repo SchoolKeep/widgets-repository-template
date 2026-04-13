@@ -6,8 +6,8 @@ import {
   inject,
   signal,
 } from "@angular/core";
-import type { Country } from "../types";
-import { CONNECTOR_PERMALINK, TOP_COUNTRIES_COUNT } from "../constants";
+import { WIDGET_SDK_TOKEN, type Country } from "../types";
+import { CONNECTOR_PERMALINK, HEADER_PROP, TOP_COUNTRIES_COUNT } from "../constants";
 import { CountryCardComponent } from "./country-card.component";
 
 @Component({
@@ -19,7 +19,7 @@ import { CountryCardComponent } from "./country-card.component";
   encapsulation: ViewEncapsulation.ShadowDom,
   template: `
     <section class="angular-widget-section">
-      <p class="widget-framework-header">Angular</p>
+      <p class="widget-framework-header">{{ header() }}</p>
       @if (loading()) {
         <ul role="status" aria-label="Loading country data" class="country-list">
           @for (_ of skeletons; track $index) {
@@ -45,14 +45,25 @@ import { CountryCardComponent } from "./country-card.component";
   `,
 })
 export class AppComponent {
+  private readonly sdk = inject(WIDGET_SDK_TOKEN);
   readonly countries = signal<Country[]>([]);
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
   readonly skeletons = Array.from({ length: TOP_COUNTRIES_COUNT });
+  readonly header = signal(this.extractHeader());
+
+  private extractHeader(): string {
+    const v = this.sdk.getProps()[HEADER_PROP];
+    return typeof v === "string" && v.trim() ? v : "Angular";
+  }
 
   constructor() {
     let cancelled = false;
-    inject(DestroyRef).onDestroy(() => { cancelled = true; });
+    const destroyRef = inject(DestroyRef);
+    destroyRef.onDestroy(() => (cancelled = true));
+    destroyRef.onDestroy(
+      this.sdk.on("propsChanged", () => this.header.set(this.extractHeader()))
+    );
 
     (async () => {
       try {

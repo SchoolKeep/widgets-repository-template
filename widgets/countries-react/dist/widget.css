@@ -7,7 +7,7 @@
   color: #1e1e2e;
   box-sizing: border-box;
   max-width: 480px;
-  margin: 24px 0 0 24px;
+  margin: 24px 0 24px 24px;
 }
 
 .country-list {
@@ -150,4 +150,7 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #444458;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
