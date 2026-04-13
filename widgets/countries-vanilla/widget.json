@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "title": "Countries Vanilla",
+  "description": "A widget built with Vanilla JS and the Widget SDK.",
+  "category": "Demo",
+  "imageSrc": "thumbnail.png",
+  "source": {
+    "path": "dist",
+    "entry": "index.html"
+  }
+}
