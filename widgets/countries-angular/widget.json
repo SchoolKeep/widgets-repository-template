@@ -7,28 +7,5 @@
   "source": {
     "path": "dist",
     "entry": "index.html"
-  },
-  "configuration": {
-    "properties": [
-      {
-        "name": "title",
-        "type": "text",
-        "label": "Title",
-        "defaultValue": "Countries Angular",
-        "rules": {
-          "required": true
-        }
-      },
-      {
-        "name": "description",
-        "type": "text",
-        "label": "Description",
-        "defaultValue": "A widget built with Angular and the Widget SDK."
-      }
-    ]
-  },
-  "defaultConfig": {
-    "title": "Countries Angular",
-    "description": "A widget built with Angular and the Widget SDK."
   }
 }

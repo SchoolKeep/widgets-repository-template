@@ -1,17 +1,47 @@
-import { useState, useEffect } from "react";
-import type { WidgetSDK, WidgetProps } from "./types";
+import { useCountries } from "./hooks/useCountries";
+import { CountryCard } from "./CountryCard";
+import { TOP_COUNTRIES_COUNT } from "./constants";
+import type { AppProps } from "./types";
 
-export function App({ sdk }: { sdk: WidgetSDK }) {
-  const [props, setProps] = useState<WidgetProps>(sdk.getProps());
+const SKELETON_KEYS = Array.from({ length: TOP_COUNTRIES_COUNT }, (_, i) => i);
 
-  useEffect(() => sdk.on("propsChanged", setProps), [sdk]);
+export const App = ({ header }: AppProps) => {
+  const { countries, loading, error } = useCountries();
 
   return (
     <section className="react-widget-section">
-      <h3 className="react-widget-title">{props.title}</h3>
-      {props.description && (
-        <p className="react-widget-description">{props.description}</p>
+      <p className="widget-framework-header">{header}</p>
+      {loading && (
+        <div role="status" aria-label="Loading country data">
+          <ul className="country-list">
+            {SKELETON_KEYS.map((i) => (
+              <li
+                key={i}
+                aria-hidden="true"
+                className="country-item country-item--skeleton"
+              >
+                <div className="country-flag country-flag--skeleton" />
+                <div className="country-details">
+                  <div className="country-skeleton-line country-skeleton-line--name" />
+                  <div className="country-skeleton-line country-skeleton-line--meta" />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {!loading && error && (
+        <div role="alert" className="country-error">
+          <p>{error}</p>
+        </div>
+      )}
+      {!loading && !error && (
+        <ul className="country-list">
+          {countries.map((c) => (
+            <CountryCard key={c.name} country={c} />
+          ))}
+        </ul>
       )}
     </section>
   );
-}
+};

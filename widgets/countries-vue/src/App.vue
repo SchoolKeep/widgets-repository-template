@@ -1,16 +1,33 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue";
-import type { WidgetSDK, WidgetProps } from "./types";
+import { inject, ref } from "vue";
+import { useCountries } from "./composables/useCountries";
+import CountryCard from "./CountryCard.vue";
+import { TOP_COUNTRIES_COUNT } from "./constants";
+import { WIDGET_HEADER_KEY } from "./types";
 
-const { sdk } = defineProps<{ sdk: WidgetSDK }>();
-const props = ref<WidgetProps>(sdk.getProps());
-const unsubscribe = sdk.on("propsChanged", (newProps) => { props.value = newProps; });
-onUnmounted(unsubscribe);
+const { countries, loading, error } = useCountries();
+const header = inject(WIDGET_HEADER_KEY, ref("Vue"));
 </script>
 
 <template>
   <section class="vue-widget-section">
-    <h3 class="vue-widget-title">{{ props.title }}</h3>
-    <p v-if="props.description" class="vue-widget-description">{{ props.description }}</p>
+    <p class="widget-framework-header">{{ header }}</p>
+    <div v-if="loading" role="status" aria-label="Loading country data">
+      <ul class="country-list">
+        <li v-for="n in TOP_COUNTRIES_COUNT" :key="n" aria-hidden="true" class="country-item country-item--skeleton">
+          <div class="country-flag country-flag--skeleton" />
+          <div class="country-details">
+            <div class="country-skeleton-line country-skeleton-line--name" />
+            <div class="country-skeleton-line country-skeleton-line--meta" />
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div v-else-if="error" role="alert" class="country-error">
+      <p>{{ error }}</p>
+    </div>
+    <ul v-else class="country-list">
+      <CountryCard v-for="c in countries" :key="c.name" :country="c" />
+    </ul>
   </section>
 </template>

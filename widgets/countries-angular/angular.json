@@ -21,7 +21,13 @@
             "tsConfig": "tsconfig.app.json",
             "polyfills": [],
             "assets": [],
-            "styles": [],
+            "styles": [
+              {
+                "input": "src/widget.css",
+                "bundleName": "widget",
+                "inject": false
+              }
+            ],
             "scripts": [],
             "outputHashing": "none"
           },

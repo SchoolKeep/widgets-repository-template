@@ -12,6 +12,7 @@ export default defineConfig(({ command }) => ({
       entry: "src/main.tsx",
       formats: ["es"],
       fileName: "widget",
+      cssFileName: "widget",
     },
   },
 }));
