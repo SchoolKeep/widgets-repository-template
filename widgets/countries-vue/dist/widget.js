@@ -3904,7 +3904,7 @@ const _l = "rest-countries", Kr = 5, ml = () => {
   },
   setup(e) {
     const t = (s) => {
-      s.target instanceof HTMLImageElement && (s.target.style.opacity = "0");
+      s.currentTarget instanceof HTMLImageElement && (s.currentTarget.style.opacity = "0");
     };
     return (s, n) => (Pe(), Le("li", {
       class: "country-item",
