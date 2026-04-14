@@ -244,7 +244,7 @@
       ],
       "name": "theme",
       "description": "Shared design tokens and component styles",
-      "path": "./stylesheets/theme/style.css"
+      "path": "stylesheets/theme/style.css"
     }
   ],
   "scripts": [
@@ -261,7 +261,7 @@
       "placement": "head",
       "name": "analytics",
       "description": "Tracks widget impressions and interactions",
-      "path": "./scripts/analytics/script.js"
+      "path": "scripts/analytics/script.js"
     }
   ]
 }
