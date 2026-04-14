@@ -473,7 +473,7 @@ if [ -d "$STYLESHEETS_DIR" ]; then
       continue
     fi
 
-    ss_path="./${STYLESHEETS_DIR}/${stylesheet_name}/${ss_file_name}"
+    ss_path="${STYLESHEETS_DIR}/${stylesheet_name}/${ss_file_name}"
 
     stylesheet=$(jq -n \
       --argjson default_rules "$STYLESHEET_DEFAULT_RULES" \
@@ -542,7 +542,7 @@ if [ -d "$SCRIPTS_DIR" ]; then
       continue
     fi
 
-    sc_path="./${SCRIPTS_DIR}/${script_name}/${sc_file_name}"
+    sc_path="${SCRIPTS_DIR}/${script_name}/${sc_file_name}"
 
     script=$(jq -n \
       --argjson default_rules "$SCRIPT_DEFAULT_RULES" \
