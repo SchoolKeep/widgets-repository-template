@@ -3,11 +3,11 @@ import { provideZonelessChangeDetection } from "@angular/core";
 import { AppComponent, WIDGET_SDK } from "./app/app.component";
 import type { WidgetSDK } from "./types";
 
-let initialized = false;
+const initializedSDKs = new WeakSet();
 
 export async function init(sdk: WidgetSDK) {
-  if (initialized) return;
-  initialized = true;
+  if (initializedSDKs.has(sdk)) return;
+  initializedSDKs.add(sdk);
   try {
     await sdk.whenReady();
     const host = document.createElement("countries-angular-root");
@@ -20,12 +20,12 @@ export async function init(sdk: WidgetSDK) {
     appRef.bootstrap(AppComponent, host);
     sdk.getContainer().appendChild(host);
     sdk.on("destroy", () => {
-      initialized = false;
+      initializedSDKs.delete(sdk);
       appRef.destroy();
       host.remove();
     });
   } catch (e) {
-    initialized = false;
+    initializedSDKs.delete(sdk);
     throw e;
   }
 }
