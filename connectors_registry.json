@@ -20,6 +20,27 @@
       ],
       "permalink": "rest-countries",
       "response_content_type": "application/json"
+    },
+    {
+      "name": "PokeAPI List",
+      "url": "https://pokeapi.co/api/v2/pokemon",
+      "method": "GET",
+      "headers": [
+        {
+          "key": "Accept",
+          "value": "application/json",
+          "overridable": false
+        }
+      ],
+      "query_parameters": [
+        {
+          "key": "limit",
+          "value": "151",
+          "overridable": false
+        }
+      ],
+      "permalink": "pokemon-search-list",
+      "response_content_type": "application/json"
     }
   ]
 }
