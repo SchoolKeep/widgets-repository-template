@@ -229,6 +229,52 @@
         "title": "Countries Html",
         "description": "A widget built with HTML and the Widget SDK."
       }
+    },
+    {
+      "type": "pokemon-search",
+      "title": "Pokémon Search",
+      "description": "Browse and search Pokémon from the PokéAPI.",
+      "version": "1.0.0",
+      "category": "Demo",
+      "imageSrc": "widgets/pokemon-search/thumbnail.png",
+      "widgetsLibrary": true,
+      "containers": [
+        "Full width"
+      ],
+      "settings": {
+        "configurable": true,
+        "editable": true,
+        "removable": true,
+        "shared": false,
+        "movable": false
+      },
+      "source": {
+        "path": "widgets/pokemon-search/dist",
+        "entry": "index.html"
+      },
+      "configuration": {
+        "properties": [
+          {
+            "name": "title",
+            "type": "text",
+            "label": "Title",
+            "defaultValue": "Pokémon Search",
+            "rules": {
+              "required": true
+            }
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "label": "Description",
+            "defaultValue": "Browse and search Pokémon from the PokéAPI."
+          }
+        ]
+      },
+      "defaultConfig": {
+        "title": "Pokémon Search",
+        "description": "Browse and search Pokémon from the PokéAPI."
+      }
     }
   ],
   "stylesheets": [

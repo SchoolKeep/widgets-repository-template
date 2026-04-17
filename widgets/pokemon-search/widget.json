@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "title": "Pokémon Search",
+  "description": "Browse and search Pokémon from the PokéAPI.",
+  "category": "Demo",
+  "imageSrc": "thumbnail.png",
+  "source": {
+    "path": "dist",
+    "entry": "index.html"
+  },
+  "settings": {
+    "shared": false,
+    "movable": false
+  },
+  "configuration": {
+    "properties": [
+      {
+        "name": "title",
+        "type": "text",
+        "label": "Title",
+        "defaultValue": "Pokémon Search",
+        "rules": {
+          "required": true
+        }
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "label": "Description",
+        "defaultValue": "Browse and search Pokémon from the PokéAPI."
+      }
+    ]
+  },
+  "defaultConfig": {
+    "title": "Pokémon Search",
+    "description": "Browse and search Pokémon from the PokéAPI."
+  }
+}
